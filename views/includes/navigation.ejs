@@ -2,7 +2,7 @@
     <div class="container mx-auto flex justify-between items-center">
         <!-- Logo -->
         <a href="#" class="text-white text-2xl font-bold">
-        LOGO
+        Joy Box
         </a>
         
         <!-- Menu toggle button for mobile -->
@@ -14,11 +14,9 @@
 
         <!-- Menu -->
         <ul id="menu" class="hidden lg:flex space-x-6 text-white">
-        <li><a href="#" class="hover:text-gray-400">Inicio</a></li>
-        <li><a href="#" class="hover:text-gray-400">Juegos PS5</a></li>
-        <li><a href="#" class="hover:text-gray-400">Juegos PC</a></li>
-        <li><a href="#" class="hover:text-gray-400">Login</a></li>
-        <li><a href="#" class="hover:text-gray-400">Registro</a></li>
+            <li><a class="<%= path === '/' ? 'border border-gray-400 bg-gray-400' : '' %> px-8 py-2  rounded-lg hover:bg-gray-400 hover:text-white transition-all" href="/">Inicio</a></li>
+            <li><a class="<%= path === '/productos' ? 'border-gray-400 bg-gray-400' : '' %> px-8 py-2  rounded-lg hover:bg-gray-400 hover:text-white transition-all" href="/productos">Juegos</a></li>
+            <li><a class="<%= path === '/admin/crear-producto' ? 'border-gray-400 bg-gray-400' : '' %> px-8 py-2  rounded-lg hover:bg-gray-400 hover:text-white transition-all" href="admin/crear-producto">Crear Producto</a></li>
         </ul>
     </div>
 </nav>

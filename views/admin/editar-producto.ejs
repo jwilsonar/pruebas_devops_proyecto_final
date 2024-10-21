@@ -1,0 +1,41 @@
+<%- include('../includes/head.ejs') %>
+</head>
+<body class="bg-gray-100">
+    
+    <%- include('../includes/navigation.ejs') %>
+    <main class="container mx-auto min-h-screen mt-5">
+        <form class="bg-white shadow-md rounded-lg p-6 w-1/2 mx-auto" action="/admin/<% if (modoEdicion) { %>editar-producto<% } else { %>crear-producto<% } %>" method="POST">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800"><% if (modoEdicion) { %>Editar Producto<% } else { %>Crear Producto<% } %></h2>
+        
+            <div class="mb-4">
+                <label for="nombre" class="block text-gray-700 text-sm font-semibold mb-2">Nombre</label>
+                <input type="text" name="nombre" id="nombre" value="<% if (modoEdicion) { %><%= producto.nombre %><% } %>" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+            </div>
+        
+            <div class="mb-4">
+                <label for="urlImagen" class="block text-gray-700 text-sm font-semibold mb-2">URL Imagen</label>
+                <input type="text" name="urlImagen" id="urlImagen" value="<% if (modoEdicion) { %><%= producto.urlImagen %><% } %>" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+            </div>
+        
+            <div class="mb-4">
+                <label for="precio" class="block text-gray-700 text-sm font-semibold mb-2">Precio</label>
+                <input type="number" name="precio" id="precio" step="0.01" value="<% if (modoEdicion) { %><%= producto.precio %><% } %>" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+            </div>
+        
+            <div class="mb-4">
+                <label for="descripcion" class="block text-gray-700 text-sm font-semibold mb-2">Descripción</label>
+                <textarea name="descripcion" id="descripcion" rows="5" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required><% if (modoEdicion) { %><%= producto.descripcion %><% } %></textarea>
+            </div>
+        
+            <% if (modoEdicion) { %>
+                <input type="hidden" value="<%= producto.id %>" name="idProducto">
+            <% } %>
+        
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                <% if (modoEdicion) { %>Actualizar Producto<% } else { %>Crear Producto<% } %>
+            </button>
+        </form>        
+    </main>
+
+    <%- include('../includes/footer.ejs') %>
+<%- include('../includes/end.ejs') %>

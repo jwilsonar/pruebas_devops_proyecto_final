@@ -5,5 +5,6 @@ const router = express.Router();
 
 // GET requiere una coincidencia exacta en la ruta
 router.get('/', tiendaController.getIndex);
+router.get('/productos', tiendaController.getProductos);
 
 module.exports = router;
