@@ -1,0 +1,59 @@
+# Node modules (dependencias de Node.js)
+node_modules/
+
+# Logs (archivos de registro)
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Archivos temporales del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Entorno de ejecución
+.env
+.env.local
+.env.*.local
+
+# Caches
+.pnpm-debug.log*
+.cache
+.npm/
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# Configuraciones de herramientas de desarrollo
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Archivos de compilación
+dist/
+build/
+
+# Cobertura de pruebas
+coverage/
+
+# Archivos de producción
+*.log
+*.gz
+*.zip
+
+# Archivos de bloqueo
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Docker y contenedores
+.dockerignore
+Dockerfile
+
+# Subidas
+uploads/
