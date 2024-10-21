@@ -7,4 +7,10 @@ const router = express.Router();
 router.get('/', tiendaController.getIndex);
 router.get('/productos', tiendaController.getProductos);
 
+router.get('/carrito', tiendaController.getCarrito);
+
+router.post('/carrito', tiendaController.postCarrito);
+
+router.post('/eliminar-producto-carrito', tiendaController.postEliminarProductoCarrito);
+
 module.exports = router;

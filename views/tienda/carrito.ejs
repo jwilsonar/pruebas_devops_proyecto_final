@@ -1,0 +1,45 @@
+<%- include('../includes/head.ejs') %>
+    </head>
+
+    <body class="bg-gray-200">
+        <%- include('../includes/navigation.ejs') %>
+        <main class="container mx-auto mt-5">
+            <% if (productos.length > 0) { %>                
+                <div class="w-full flex justify-around flex-col lg:flex-row gap-8">
+                    <div class="lg:w-1/2 ">
+                        <h1 class="text-xl mb-5 font-semibold">Carro</h1>
+                        <ul class="bg-white p-5 rounded-xl">
+                            <% productos.forEach(p => { %>
+                                
+                                <li class="flex items-center justify-between mb-5">
+                                    <div>
+                                        <p class="font-bold"><%= p.dataProducto.nombre %></p>
+                                        <p>Cantidad: <%= p.cantidad %></p>
+                                    </div>
+                                    <form action="/eliminar-producto-carrito" method="POST">
+                                        <input type="hidden" value="<%= p.dataProducto.id %>" name="idProducto">
+                                        <button class="px-8 py-2 bg-red-500 text-white rounded-lg" type="submit">Eliminar</button>
+                                    </form>
+                                </li>
+                                
+                            <% }) %>
+                        </ul>
+                    </div>
+    
+                    <div class="w-1/2">
+                        <h1 class="text-xl mb-5 font-semibold">Resumen de compra</h1>
+                        <div class="bg-white p-5 rounded-xl">
+                            <div class="flex justify-between items-center mb-2">
+                                <p>Productos (<%= productos.length %>)</p>
+                                <p>S/. <%= precioTotal%></p>
+                            </div>
+                            <hr class="mb-2">
+                            <p class="text-right">Total: S/. <strong><%= precioTotal%></strong></p>
+                        </div>
+                    </div>
+                </div>
+            <% } else { %>
+                <h1>No hay productos en el carrito!</h1>
+            <% } %>
+        </main>
+        <%- include('../includes/end.ejs') %>

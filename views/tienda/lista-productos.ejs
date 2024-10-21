@@ -9,7 +9,7 @@
         <% if (prods.length > 0) { %>
             <div class="flex gap-4">
                 <% for (let producto of prods) { %>
-                    <article class="bg-white shadow-lg rounded-lg overflow-hidden p-4 border border-gray-200 transition-transform transform hover:scale-105 w-[200px]">
+                    <article class="bg-white shadow-lg rounded-lg overflow-hidden p-4 border border-gray-200 transition-transform transform hover:scale-105 w-[250px]">
                         <header class="mb-4">
                             <h1 class="text-xl font-semibold text-gray-800 truncate text-center"><%= producto.nombre %></h1>
                         </header>
@@ -20,6 +20,7 @@
                             <h2 class="text-lg font-bold text-gray-900">S/ <%= producto.precio %></h2>
                             <p class="text-gray-600 mt-1 line-clamp-3"><%= producto.descripcion %></p>
                         </div>
+                        <%- include('../includes/agregar-al-carrito.ejs', {producto: producto}) %>
                     </article>
                     
                 <% } %>

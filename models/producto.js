@@ -2,12 +2,15 @@ const fs = require('fs');
 const path = require('path');
 
 const raizDir = require('../utils/path');
+const Carrito = require('./carrito');
+
 
 const p = path.join(
     raizDir,
     'data',
     'productos.json'
 );
+
 const getProductosFromFile = cb => {
     fs.readFile(p, (err, fileContent) => {
         if (err) {
