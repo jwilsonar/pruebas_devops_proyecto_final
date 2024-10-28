@@ -10,18 +10,14 @@
                         <h1 class="text-xl mb-5 font-semibold">Carro</h1>
                         <ul class="bg-white p-5 rounded-xl">
                             <% productos.forEach(p => { %>
-                                
-                                <li class="flex items-center justify-between mb-5">
-                                    <div>
-                                        <p class="font-bold"><%= p.dataProducto.nombre %></p>
-                                        <p>Cantidad: <%= p.cantidad %></p>
-                                    </div>
+                                <li class="cart__item">
+                                    <h1><%= p.dataProducto.nombre %></h1>
+                                    <h2>Cantidad: <%= p.cantidad %></h2>
                                     <form action="/eliminar-producto-carrito" method="POST">
-                                        <input type="hidden" value="<%= p.dataProducto.id %>" name="idProducto">
-                                        <button class="px-8 py-2 bg-red-500 text-white rounded-lg" type="submit">Eliminar</button>
+                                        <input type="hidden" value="<%= p.idProducto._id %>" name="idProducto">
+                                        <button class="btn danger" type="submit">Eliminar</button>
                                     </form>
                                 </li>
-                                
                             <% }) %>
                         </ul>
                     </div>
