@@ -10,15 +10,36 @@
             </svg>
         </button>
 
-        <ul id="menu" class="hidden lg:flex space-x-6 text-white flex-1">
+        <ul id="menu" class="hidden lg:flex space-x-6 text-white flex-1 lg:justify-end">
             <li><a class="<%= path === '/' ? 'border border-gray-400 bg-gray-400' : '' %> px-8 py-2  rounded-lg hover:bg-gray-400 hover:text-white transition-all" href="/">Inicio</a></li>
             <li><a class="<%= path === '/productos' ? 'border-gray-400 bg-gray-400' : '' %> px-8 py-2  rounded-lg hover:bg-gray-400 hover:text-white transition-all" href="/productos">Juegos</a></li>
-            <li><a class="<%= path === '/carrito' ? 'border-gray-400 bg-gray-400' : '' %> px-8 py-2  rounded-lg hover:bg-gray-400 hover:text-white transition-all" href="/carrito">Carrito</a></li>
+            <li class="relative group">
+                <a class="<%= path === '/explorar' ? 'border-gray-400 bg-gray-400' : '' %> px-8 py-2 rounded-lg hover:bg-gray-400 hover:text-white transition-all" href="#">Explorar</a>
+                <ul class="absolute left-0 hidden mt-2 space-y-2 bg-gray-800 text-white rounded-lg group-hover:block z-10">
+                    <li><a class="block px-6 py-2 hover:bg-gray-600" href="/categorias">Categoría</a></li>
+                    <li><a class="block px-6 py-2 hover:bg-gray-600" href="/generos">Género</a></li>
+                    <li><a class="block px-6 py-2 hover:bg-gray-600" href="/desarrolladores">Desarrollador</a></li>
+                </ul>
+            </li>
+            <% if(autenticado===true && tipoUsuario === 'user'){ %>
+                <li><a class="<%= path === '/carrito' ? 'border-gray-400 bg-gray-400' : '' %> px-8 py-2  rounded-lg hover:bg-gray-400 hover:text-white transition-all" href="/carrito">Carrito</a></li>
+            
+            
+            <% } %>
             
         </ul>
-        <ul class="border border-gray-400 lg:flex space-x-6 text-white px-8 py-2 rounded-lg">
-            <li><a class="<%= path === '/admin/crear-producto' ? 'border-gray-400 bg-gray-400' : '' %> px-8 py-2  rounded-lg hover:bg-gray-400 hover:text-white transition-all" href="/admin/crear-producto">Crear Producto</a></li>
-            <li><a class="<%= path === '/admin/productos' ? 'border-gray-400 bg-gray-400' : '' %> px-8 py-2  rounded-lg hover:bg-gray-400 hover:text-white transition-all" href="/admin/productos">Productos</a></li>
-        </ul>
+        
+        <% if(autenticado===true && tipoUsuario ==='admin') { %>
+            <ul class="border border-gray-400 lg:flex space-x-6 text-white px-8 py-2 rounded-lg">
+                <li><a class="<%= path === '/admin/crear-producto' ? 'border-gray-400 bg-gray-400' : '' %> px-8 py-2  rounded-lg hover:bg-gray-400 hover:text-white transition-all" href="/admin/crear-producto">Crear Producto</a></li>
+                <li><a class="<%= path === '/admin/productos' ? 'border-gray-400 bg-gray-400' : '' %> px-8 py-2  rounded-lg hover:bg-gray-400 hover:text-white transition-all" href="/admin/productos">Productos</a></li>
+            </ul>
+        <% } %>
+
+        <% if(!autenticado){ %>
+            <li><a class="<%= path === '/login' ? 'border bg-gray-400' : '' %> px-8 py-2  rounded-lg hover:bg-gray-400 hover:text-white transition-all text-white border border-gray-400" href="/login">Ingresar</a></li>
+        <% }else{ %>
+            <form action="/cerrar-sesion" method="POST" class="flex items-center justify-center ml-6"><button type="submit" class="<%= path === '/login' ? 'border bg-gray-400' : '' %> px-8 py-2  rounded-lg hover:bg-gray-400 hover:text-white transition-all text-white border border-gray-400">Cerrar sesión</button></form>
+        <% } %>
     </div>
 </nav>

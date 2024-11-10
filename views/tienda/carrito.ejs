@@ -4,14 +4,14 @@
     <body class="bg-gray-200">
         <%- include('../includes/navigation.ejs') %>
         <main class="container mx-auto mt-5">
-            <% if (productos.length > 0) { %>                
+            <% if (carrito.productos.length > 0) { %>                
                 <div class="w-full flex justify-around flex-col lg:flex-row gap-8">
                     <div class="lg:w-1/2 ">
                         <h1 class="text-xl mb-5 font-semibold">Carro</h1>
                         <ul class="bg-white p-5 rounded-xl">
-                            <% productos.forEach(p => { %>
+                            <% carrito.productos.forEach(p => { %>
                                 <li class="cart__item">
-                                    <h1><%= p.dataProducto.nombre %></h1>
+                                    <h1><%= p.idProducto.nombre %></h1>
                                     <h2>Cantidad: <%= p.cantidad %></h2>
                                     <form action="/eliminar-producto-carrito" method="POST">
                                         <input type="hidden" value="<%= p.idProducto._id %>" name="idProducto">
@@ -26,11 +26,11 @@
                         <h1 class="text-xl mb-5 font-semibold">Resumen de compra</h1>
                         <div class="bg-white p-5 rounded-xl">
                             <div class="flex justify-between items-center mb-2">
-                                <p>Productos (<%= productos.length %>)</p>
-                                <p>S/. <%= precioTotal%></p>
+                                <p>Productos (<%= carrito.length %>)</p>
+                                <p>S/. <%= carrito.precioTotal%></p>
                             </div>
                             <hr class="mb-2">
-                            <p class="text-right">Total: S/. <strong><%= precioTotal%></strong></p>
+                            <p class="text-right">Total: S/. <strong><%= carrito.precioTotal%></strong></p>
                         </div>
                     </div>
                 </div>

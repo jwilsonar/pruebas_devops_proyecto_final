@@ -6,7 +6,8 @@ const pedidoSchema = new Schema({
     productos: [
         {
             producto: { type: Object, required: true },
-            cantidad: { type: Number, required: true }
+            cantidad: { type: Number, required: true },
+            precio: Number
         }
     ],
     usuario: {
@@ -19,6 +20,19 @@ const pedidoSchema = new Schema({
             required: true,
             ref: 'Usuario'
         }
+    },
+    total: {
+        type: Number,
+        required: true
+    },
+    estado: {
+        type: String,
+        enum: ['pendiente', 'enviado', 'entregado', 'cancelado'],
+        default: 'pendiente'
+    },
+    fechaPedido: {
+        type: Date,
+        default: Date.now
     }
 });
 

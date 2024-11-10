@@ -36,7 +36,9 @@ exports.getIndex = (req, res, next) => {
     res.render('tienda/index', {
       prods: productos,
       titulo: 'Tienda',
-      path: '/'
+      path: '/',
+      autenticado: req.session.autenticado,
+      tipoUsuario: req.session.tipoUsuario
     });
   })
   .catch(err => {
@@ -49,10 +51,19 @@ exports.getCarrito = (req, res, next) => {
     .populate('carrito.items.idProducto')
     .then(usuario => {
       const productos = usuario.carrito.items;
+      console.log("Carrito")
+      
+      let precioTotal = 0;
+      productos.forEach(p=>precioTotal+=(p.idProducto.precio*p.cantidad))
+      let carrito = {
+        productos,
+        precioTotal
+      }
+      console.log(carrito)
       res.render('tienda/carrito', {
         path: '/carrito',
         titulo: 'Mi Carrito',
-        productos: productos
+        carrito: carrito
       });
     })
     .catch(err => console.log(err));
