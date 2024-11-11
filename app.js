@@ -27,7 +27,7 @@ const store = new MongoDBStore({
 })
 app.use(session({secret:'valor secreto', resave:false, saveUnitialized: false, store: store}))
 
-
+console.log("Hello world");
 app.use(tiendaRoutes);
 app.use('/admin',adminRoutes);
 app.use(authRoutes);
