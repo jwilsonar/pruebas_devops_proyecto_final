@@ -1,26 +1,63 @@
+const Categoria = require('../models/categoria');
+const Desarrollador = require('../models/desarrollador');
+const Plataforma = require('../models/plataforma');
+const Genero = require('../models/genero');
 const Producto = require('../models/producto');
 
-exports.getCrearProducto = (req, res, next) => {
-    res.render('admin/editar-producto', { 
-        titulo: 'Crear Producto',
-        path: '/admin/crear-producto',
-        modoEdicion: false
+exports.getIndexAdmin = (req, res) => {
+  if (!req.session.autenticado || req.session.tipoUsuario !== 'admin') {
+    return res.redirect('/login');
+  }
+
+  // Usamos Promise.all para ejecutar las consultas de manera paralela
+  Promise.all([
+    Producto.find(), // Obtener productos
+    Categoria.find(), // Obtener categorías
+    Desarrollador.find(), // Obtener desarrolladores
+    Plataforma.find(), // Obtener plataformas
+    Genero.find() // Obtener géneros
+  ])
+    .then(([productos, categorias, desarrolladores, plataformas, generos]) => {
+      res.render('admin/index-admin', {
+        path: 'admin/index-admin',
+        titulo: 'Administración',
+        autenticado: req.session.autenticado,
+        tipoUsuario: req.session.tipoUsuario,
+        prods: productos, // Pasar los productos al render
+        categorias, // Pasar las categorías
+        desarrolladores, // Pasar los desarrolladores
+        plataformas, // Pasar las plataformas
+        generos // Pasar los géneros
+      });
+    })
+    .catch(err => {
+      console.error('Error al obtener datos:', err);
     });
 };
+
+
+// exports.getCrearProducto = (req, res, next) => {
+//     res.render('admin/editar-producto', { 
+//         titulo: 'Crear Producto',
+//         path: '/admin/crear-producto',
+//         modoEdicion: false
+//     });
+// };
 
 exports.postCrearProducto = (req, res, next) => {
     const nombre = req.body.nombre;
     const urlImagen = req.body.urlImagen;
     const precio = req.body.precio;
     const descripcion = req.body.descripcion;
-    const producto = new Producto({nombre: nombre, precio: precio, descripcion: descripcion, urlImagen: urlImagen, idUsuario: req.usuario._id
+    console.log(req.session.usuario)
+    const producto = new Producto({nombre: nombre, precio: precio, descripcion: descripcion, urlImagen: urlImagen, idUsuario: req.session.usuario._id
     });
     producto
         .save()
         .then(result => {
         // console.log(result);
         console.log('Producto Creado');
-        res.redirect('/admin/productos');
+        res.redirect('/admin/');
         })
         .catch(err => {
         console.log(err);

@@ -1,0 +1,71 @@
+<nav class="bg-[#111010] min-h-screen p-4 w-50 flex flex-col justify-center fixed">
+    <a href="/" class="text-white text-2xl font-bold mb-8 absolute top-4 left-4">
+        Joy Box
+    </a>
+    <ul class="space-y-4 w-full flex h-full gap-6 justify-between flex-col">
+        <li>
+            <a href="/admin" class="flex items-center space-x-4 px-4 py-2 text-white hover:bg-gray-700 rounded-lg w-full <%= path === '/' ? 'bg-gray-700' : '' %>">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M5 3a2 2 0 00-2 2v16l7-3 7 3V5a2 2 0 00-2-2H5z"></path>
+                </svg>
+                <span>Inicio</span>
+            </a>
+        </li>
+        <li>
+            <a href="/admin/productos" class="flex items-center space-x-4 px-4 py-2 text-white hover:bg-gray-700 rounded-lg w-full <%= path === '/productos' ? 'bg-gray-700' : '' %>">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2a10 10 0 100 20 10 10 0 000-20zM6.7 6.7a5.973 5.973 0 018.486 8.486l-8.486-8.486zm8.486 8.486a5.973 5.973 0 01-8.486-8.486l8.486 8.486z"></path>
+                </svg>
+                <span>Juegos</span>
+            </a>
+        </li>
+        <li>
+            <a href="/admin/categorias" class="flex items-center space-x-4 px-4 py-2 text-white hover:bg-gray-700 rounded-lg w-full <%= path === '/explorar' ? 'bg-gray-700' : '' %>">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0l3.09 6.26L18 6.99l-4.5 4.37L14.62 18 12 15.24 9.38 18l1.12-6.64L6 6.99l2.91-.73L12 0z"></path>
+                </svg>
+                <span>Categorias</span>
+            </a>
+        </li>
+        <li>
+            <a href="/admin/desarrolladores" class="flex items-center space-x-4 px-4 py-2 text-white hover:bg-gray-700 rounded-lg w-full <%= path === '/admin/crear-producto' ? 'bg-gray-700' : '' %>">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M5 8h14v2H5zm0 4h14v2H5zm0 4h8v2H5z"></path>
+                </svg>
+                <span>Desarrolladores</span>
+            </a>
+        </li>
+        <li>
+            <a href="/admin/plataformas" class="flex items-center space-x-4 px-4 py-2 text-white hover:bg-gray-700 rounded-lg w-full <%= path === '/admin/productos' ? 'bg-gray-700' : '' %>">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 12l3 3 6-6 6 6 3-3-9-9z"></path>
+                </svg>
+                <span>Plataformas</span>
+            </a>
+        </li>
+        <li>
+            <a href="/admin/generos" class="flex items-center space-x-4 px-4 py-2 text-white hover:bg-gray-700 rounded-lg w-full <%= path === '/admin/productos' ? 'bg-gray-700' : '' %>">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 12l3 3 6-6 6 6 3-3-9-9z"></path>
+                </svg>
+                <span>Generos</span>
+            </a>
+        </li>
+        <li>
+            <a href="/admin/pedidos" class="flex items-center space-x-4 px-4 py-2 text-white hover:bg-gray-700 rounded-lg w-full <%= path === '/admin/productos' ? 'bg-gray-700' : '' %>">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 12l3 3 6-6 6 6 3-3-9-9z"></path>
+                </svg>
+                <span>Pedidos</span>
+            </a>
+        </li>
+        <form action="/cerrar-sesion" method="POST" class="w-full">
+            <button type="submit" class="flex items-center space-x-4 px-4 py-2 text-white hover:bg-gray-700 rounded-lg w-full">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M10 12l-4 4v-8l4 4zm2-2h6v2h-6z"></path>
+                </svg>
+                <span>Cerrar sesión</span>
+            </button>
+        </form>
+    </ul>
+</nav>

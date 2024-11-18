@@ -8,7 +8,9 @@ exports.getProductos = (req, res, next) => {
       res.render('tienda/lista-productos', {
         prods: productos,
         titulo: 'Todos los Productos',
-        path: '/productos'
+        path: '/productos',
+        autenticado: req.session.autenticado,
+        tipoUsuario: req.session.tipoUsuario
       });
     })
   .catch(err => {

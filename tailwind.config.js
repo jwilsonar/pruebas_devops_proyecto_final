@@ -5,7 +5,11 @@ module.exports = {
     './public/**/*.js',  // Si tienes scripts JS
   ],
   theme: {
-    extend: {},
+    extend: {
+      maxWidth:{
+        aministrador: "calc(100vw - 200px)"
+      }
+    },
   },
   plugins: [],
 }

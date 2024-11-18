@@ -3,16 +3,19 @@ const path = require('path');
 const express = require('express');
 
 const adminController = require('../controllers/admin');
+const is_auth = require('../middleware/is_auth')
 
 
 const router = express.Router();
 
-router.get('/crear-producto', adminController.getCrearProducto);
-router.get('/productos', adminController.getProductos);
-router.post('/crear-producto', adminController.postCrearProducto);
-router.get('/editar-producto/:idProducto', adminController.getEditarProducto);
-router.post('/editar-producto', adminController.postEditarProducto);
-router.post('/eliminar-producto', adminController.postEliminarProducto);
+router.get('/', is_auth, adminController.getIndexAdmin);
+
+//router.get('/crear-producto',is_auth, adminController.getCrearProducto);
+router.get('/productos', is_auth, adminController.getProductos);
+router.post('/crear-producto', is_auth, adminController.postCrearProducto);
+router.get('/editar-producto/:idProducto',is_auth, adminController.getEditarProducto);
+router.post('/editar-producto',is_auth, adminController.postEditarProducto);
+router.post('/eliminar-producto',is_auth, adminController.postEliminarProducto);
 
 //Para las categorias
 // router.get('/categorias', adminController.getCategorias);

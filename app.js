@@ -5,6 +5,7 @@ var session = require('express-session')
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const Usuario = require('./models/usuario');
+const flash = require('connect-flash')
 
 const MONGODB_URI = "mongodb+srv://a20200308:secreto@cluster0.4bkjl.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
@@ -26,7 +27,7 @@ const store = new MongoDBStore({
     collection: 'sessions'
 })
 app.use(session({secret:'valor secreto', resave:false, saveUnitialized: false, store: store}))
-
+app.use(flash());
 console.log("Hello world");
 app.use(tiendaRoutes);
 app.use('/admin',adminRoutes);

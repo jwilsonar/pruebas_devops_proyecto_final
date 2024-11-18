@@ -28,9 +28,11 @@
                                 <h2 class="text-lg font-bold text-gray-900">S/ <%= producto.precio %></h2>
                                 <p class="text-gray-600 mt-1 line-clamp-3"><%= producto.descripcion %></p>
                             </div>
+                            <% if(autenticado && tipoUsuario === 'user'){%>
                             <div class="card__actions">
                                 <%- include('../includes/agregar-al-carrito.ejs', {producto: producto}) %>
                             </div>
+                            <% }%>
                         </article>
                         
                     <% } %>
