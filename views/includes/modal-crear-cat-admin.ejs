@@ -1,0 +1,82 @@
+<!-- Botón para abrir el modal -->
+<button 
+id="openModal" 
+class="mb-5 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+>
+Agregar
+</button>
+
+<!-- Modal -->
+<div 
+id="modal" 
+class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden"
+>
+<div class="bg-white rounded-lg shadow-lg p-8 max-w-lg w-full">
+    <h2 class="text-xl font-bold mb-4">Agregar Categoría</h2>
+    <form action="crear-categoria" method="POST" class="flex flex-col gap-4" enctype="multipart/form-data">
+        <!-- Nombre -->
+        <div>
+            <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
+            <input 
+                type="text" 
+                id="nombre" 
+                name="nombre" 
+                required 
+                class="mt-1 p-2 border border-gray-300 rounded w-full"
+            >
+        </div>
+    
+        <!-- Descripción -->
+        <div>
+            <label for="descripcion" class="block text-sm font-medium text-gray-700">Descripción</label>
+            <textarea 
+                id="descripcion" 
+                name="descripcion" 
+                rows="3" 
+                required 
+                class="mt-1 p-2 border border-gray-300 rounded w-full"
+            ></textarea>
+        </div>
+        <!-- Imagen de portada -->
+        <div>
+            <label for="imagen" class="block text-sm font-medium text-gray-700">Imagen de Portada</label>
+            <input 
+                type="file" 
+                id="imagen" 
+                name="imagen" 
+                required >
+        </div>
+        
+        <!-- Botones -->
+        <div class="flex justify-end gap-4">
+            <button 
+                type="button" 
+                id="closeModal" 
+                class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
+            >
+                Cancelar
+            </button>
+            <button 
+                type="submit" 
+                class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
+            >
+                Guardar
+            </button>
+        </div>
+    </form>    
+</div>
+</div>
+<script>
+    // JavaScript para abrir y cerrar el modal
+    const modal = document.getElementById('modal');
+    const openModalBtn = document.getElementById('openModal');
+    const closeModalBtn = document.getElementById('closeModal');
+
+    openModalBtn.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+        modal.classList.add('hidden');
+    });
+</script>

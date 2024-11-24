@@ -9,12 +9,22 @@ const generoSchema = new Schema({
         required: true,
         unique: true
     },
+    imagen:{
+        type: String,
+        required: true
+    },
+    slug: {
+        type: String,
+        required: true,
+        unique: true
+    },
     descripcion: String
 });
 
-generoSchema.pre('save', function(next) {
-    if (!this.slug) {
-        this.slug = slugify(`${this.nombre}`, { lower: true });
+// Middleware para generar el slug antes de la validación
+generoSchema.pre('validate', function (next) {
+    if (!this.slug && this.nombre) {
+        this.slug = slugify(this.nombre, { lower: true });
     }
     next();
 });

@@ -1,172 +1,159 @@
 <!-- Botón para abrir el modal -->
 <button 
-id="openModal" 
-class="mb-5 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+    id="openModal" 
+    class="mb-5 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
 >
-Agregar
+    Agregar
 </button>
 
 <!-- Modal -->
 <div 
-id="modal" 
-class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden"
+    id="modal" 
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden"
 >
-<div class="bg-white rounded-lg shadow-lg p-8 max-w-lg w-full">
-    <h2 class="text-xl font-bold mb-4">Agregar Producto</h2>
-    <form action="/crear-producto/" method="POST" class="flex flex-col gap-4">
-        <!-- Nombre -->
-        <div>
-            <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
-            <input 
-                type="text" 
-                id="nombre" 
-                name="nombre" 
-                required 
-                class="mt-1 p-2 border border-gray-300 rounded w-full"
-            >
-        </div>
-    
-        <!-- Descripción -->
-        <div>
-            <label for="descripcion" class="block text-sm font-medium text-gray-700">Descripción</label>
-            <textarea 
-                id="descripcion" 
-                name="descripcion" 
-                rows="3" 
-                required 
-                class="mt-1 p-2 border border-gray-300 rounded w-full"
-            ></textarea>
-        </div>
-    
-        <!-- Precio -->
-        <div>
-            <label for="precio" class="block text-sm font-medium text-gray-700">Precio</label>
-            <input 
-                type="number" 
-                id="precio" 
-                name="precio" 
-                step="0.01" 
-                required 
-                class="mt-1 p-2 border border-gray-300 rounded w-full"
-            >
-        </div>
-    
-        <!-- Stock -->
-        <div>
-            <label for="stock" class="block text-sm font-medium text-gray-700">Stock</label>
-            <input 
-                type="number" 
-                id="stock" 
-                name="stock" 
-                required 
-                class="mt-1 p-2 border border-gray-300 rounded w-full"
-            >
-        </div>
-    
-        <!-- Imagen de portada -->
-        <div>
-            <label for="imagen_portada" class="block text-sm font-medium text-gray-700">Imagen de Portada (URL)</label>
-            <input 
-                type="url" 
-                id="imagen_portada" 
-                name="imagen_portada" 
-                required 
-                class="mt-1 p-2 border border-gray-300 rounded w-full"
-            >
-        </div>
-    
-        <!-- Categoría -->
-        <div>
-            <label for="categoria" class="block text-sm font-medium text-gray-700">Categoría</label>
-            <select 
-                id="categoria" 
-                name="categoria" 
-                required 
-                class="mt-1 p-2 border border-gray-300 rounded w-full"
-            >
-                <!-- Opciones dinámicas -->
-                <% categorias.forEach(categoria => { %>
-                    <option value="<%= categoria._id %>"><%= categoria.nombre %></option>
-                <% }); %>
-            </select>
-        </div>
-    
-        <!-- Desarrollador -->
-        <div>
-            <label for="desarrollador" class="block text-sm font-medium text-gray-700">Desarrollador</label>
-            <select 
-                id="desarrollador" 
-                name="desarrollador" 
-                required 
-                class="mt-1 p-2 border border-gray-300 rounded w-full"
-            >
-                <% desarrolladores.forEach(desarrollador => { %>
-                    <option value="<%= desarrollador._id %>"><%= desarrollador.nombre %></option>
-                <% }); %>
-            </select>
-        </div>
-    
-        <!-- Plataforma -->
-        <div>
-            <label for="plataforma" class="block text-sm font-medium text-gray-700">Plataforma</label>
-            <select 
-                id="plataforma" 
-                name="plataforma" 
-                required 
-                class="mt-1 p-2 border border-gray-300 rounded w-full"
-            >
-                <% plataformas.forEach(plataforma => { %>
-                    <option value="<%= plataforma._id %>"><%= plataforma.nombre %></option>
-                <% }); %>
-            </select>
-        </div>
-    
-        <!-- Género -->
-        <div>
-            <label for="genero" class="block text-sm font-medium text-gray-700">Género</label>
-            <select 
-                id="genero" 
-                name="genero" 
-                required 
-                class="mt-1 p-2 border border-gray-300 rounded w-full"
-            >
-                <% generos.forEach(genero => { %>
-                    <option value="<%= genero._id %>"><%= genero.nombre %></option>
-                <% }); %>
-            </select>
-        </div>
-    
-        <!-- Slug -->
-        <div>
-            <label for="slug" class="block text-sm font-medium text-gray-700">Slug</label>
-            <input 
-                type="text" 
-                id="slug" 
-                name="slug" 
-                required 
-                class="mt-1 p-2 border border-gray-300 rounded w-full"
-            >
-        </div>            
-    
-        <!-- Botones -->
-        <div class="flex justify-end gap-4">
-            <button 
-                type="button" 
-                id="closeModal" 
-                class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
-            >
-                Cancelar
-            </button>
-            <button 
-                type="submit" 
-                class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
-            >
-                Guardar
-            </button>
-        </div>
-    </form>    
+    <div class="bg-white rounded-lg shadow-lg p-8 max-w-4xl w-full">
+        <h2 class="text-xl font-bold mb-4">Agregar Producto</h2>
+        <form action="crear-producto" method="POST" class="grid grid-cols-2 gap-6" enctype="multipart/form-data">
+            <!-- Nombre -->
+            <div>
+                <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
+                <input 
+                    type="text" 
+                    id="nombre" 
+                    name="nombre" 
+                    required 
+                    class="mt-1 p-2 border border-gray-300 rounded w-full"
+                >
+            </div>
+        
+            <!-- Descripción -->
+            <div class="col-span-2">
+                <label for="descripcion" class="block text-sm font-medium text-gray-700">Descripción</label>
+                <textarea 
+                    id="descripcion" 
+                    name="descripcion" 
+                    rows="3" 
+                    required 
+                    class="mt-1 p-2 border border-gray-300 rounded w-full"
+                ></textarea>
+            </div>
+        
+            <!-- Precio -->
+            <div>
+                <label for="precio" class="block text-sm font-medium text-gray-700">Precio</label>
+                <input 
+                    type="number" 
+                    id="precio" 
+                    name="precio" 
+                    step="0.01" 
+                    required 
+                    class="mt-1 p-2 border border-gray-300 rounded w-full"
+                >
+            </div>
+        
+            <!-- Stock -->
+            <div>
+                <label for="stock" class="block text-sm font-medium text-gray-700">Stock</label>
+                <input 
+                    type="number" 
+                    id="stock" 
+                    name="stock" 
+                    required 
+                    class="mt-1 p-2 border border-gray-300 rounded w-full"
+                >
+            </div>
+        
+            <!-- Imagen de portada -->
+            <div>
+                <label for="imagen" class="block text-sm font-medium text-gray-700">Imagen de Portada</label>
+                <input 
+                    type="file" 
+                    id="imagen" 
+                    name="imagen" 
+                    required 
+                >
+            </div>
+        
+            <!-- Categoría -->
+            <div>
+                <label for="categoria" class="block text-sm font-medium text-gray-700">Categoría</label>
+                <select 
+                    id="categoria" 
+                    name="categoria" 
+                    required 
+                    class="mt-1 p-2 border border-gray-300 rounded w-full"
+                >
+                    <% categorias.forEach(categoria => { %>
+                        <option value="<%= categoria._id %>"><%= categoria.nombre %></option>
+                    <% }); %>
+                </select>
+            </div>
+        
+            <!-- Desarrollador -->
+            <div>
+                <label for="desarrollador" class="block text-sm font-medium text-gray-700">Desarrollador</label>
+                <select 
+                    id="desarrollador" 
+                    name="desarrollador" 
+                    required 
+                    class="mt-1 p-2 border border-gray-300 rounded w-full"
+                >
+                    <% desarrolladores.forEach(desarrollador => { %>
+                        <option value="<%= desarrollador._id %>"><%= desarrollador.nombre %></option>
+                    <% }); %>
+                </select>
+            </div>
+        
+            <!-- Plataforma -->
+            <div>
+                <label for="plataforma" class="block text-sm font-medium text-gray-700">Plataforma</label>
+                <select 
+                    id="plataforma" 
+                    name="plataforma" 
+                    required 
+                    class="mt-1 p-2 border border-gray-300 rounded w-full"
+                >
+                    <% plataformas.forEach(plataforma => { %>
+                        <option value="<%= plataforma._id %>"><%= plataforma.nombre %></option>
+                    <% }); %>
+                </select>
+            </div>
+        
+            <!-- Género -->
+            <div>
+                <label for="genero" class="block text-sm font-medium text-gray-700">Género</label>
+                <select 
+                    id="genero" 
+                    name="genero" 
+                    required 
+                    class="mt-1 p-2 border border-gray-300 rounded w-full"
+                >
+                    <% generos.forEach(genero => { %>
+                        <option value="<%= genero._id %>"><%= genero.nombre %></option>
+                    <% }); %>
+                </select>
+            </div>           
+        
+            <!-- Botones -->
+            <div class="col-span-2 flex justify-end gap-4">
+                <button 
+                    type="button" 
+                    id="closeModal" 
+                    class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
+                >
+                    Cancelar
+                </button>
+                <button 
+                    type="submit" 
+                    class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
+                >
+                    Guardar
+                </button>
+            </div>
+        </form>    
+    </div>
 </div>
-</div>
+
 <script>
     // JavaScript para abrir y cerrar el modal
     const modal = document.getElementById('modal');

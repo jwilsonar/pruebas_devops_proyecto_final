@@ -13,22 +13,46 @@ const app = express();
 const tiendaRoutes = require('./routes/tienda')
 const adminRoutes = require('./routes/admin')
 const errorController = require('./controllers/error')
-const authRoutes = require('./routes/auth')
+const authRoutes = require('./routes/auth');
+const multer = require('multer');
 const MongoDBStore = require('connect-mongodb-session')(session)
+
+const fileStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'imagenes');
+    },
+    filename: (req, file, cb) => {
+        cb(null, new Date().toISOString().replace(/:/g, '-') + '-' + file.originalname);
+    }
+});
+
+const fileFilter = (req, file, cb)=>{
+    if(
+        file.mimetype === 'image/png'||
+        file.mimetype === 'image/jpg'||
+        file.mimetype === 'image/jpeg'
+
+    ){
+        cb(null, true)
+    }else{
+        cb(null, false)
+    }
+}
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(multer({storage: fileStorage, fileFilter: fileFilter}).single('imagen'));
 app.use(express.static(path.join(raizDir, 'public')));
+app.use('/imagenes', express.static(path.join(__dirname, 'imagenes')));
 
 const store = new MongoDBStore({
     uri: MONGODB_URI,
     collection: 'sessions'
 })
-app.use(session({secret:'valor secreto', resave:false, saveUnitialized: false, store: store}))
+app.use(session({ secret: 'valor secreto', resave: false, saveUninitialized: false, store: store }));
 app.use(flash());
-console.log("Hello world");
 app.use(tiendaRoutes);
 app.use('/admin',adminRoutes);
 app.use(authRoutes);

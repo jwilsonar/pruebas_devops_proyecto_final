@@ -1,0 +1,71 @@
+<%- include('../includes/head.ejs') %>
+</head>
+
+<body class="bg-gray-200 ">
+    <%- include('../includes/navigation-admin.ejs') %>
+    <main class="flex flex-col min-h-screen max-w-aministrador right-0 absolute w-full">        
+        <div class="container mx-auto flex-1">
+            <h1 class="text-2xl font-semibold mb-5 mt-5">Desarrolladores</h1>
+            <%- include('../includes/modal-crear-desa-admin.ejs') %>
+            <% if (desarrolladores.length > 0) { %>
+                <table class="table-auto border-collapse border border-gray-200 w-full">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Nombre</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Imagen</th>                            
+                            <th class="border border-gray-300 px-4 py-2 text-left">Descripción</th>
+                            <th class="border border-gray-300 px-4 py-2 text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% for (let desarrollador of desarrolladores) { %>
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="border border-gray-300 px-4 py-2"><%= desarrollador.nombre %></td>
+                                <td class="border border-gray-300 px-4 py-2">
+                                    <img src="/<%= desarrollador.imagen %>" alt="<%= desarrollador.nombre %>" class="w-20 h-20 object-cover rounded-md">
+                                </td>                        
+                                <td class="border border-gray-300 px-4 py-2 max-w-[250px] overflow-hidden whitespace-nowrap text-ellipsis"><%= desarrollador.descripcion %></td>
+                                <td class="border border-gray-300 px-4 py-2 text-center">
+                                    <button 
+                                        class="ml-4 text-blue-500 hover:underline"
+                                        type="button" 
+                                        onclick="openEditModal('<%= desarrollador.nombre %>', '<%= desarrollador.imagen %>', '<%= desarrollador.descripcion %>', '<%= desarrollador._id %>', '<%= desarrollador.fechaFundacion %>','<%= desarrollador.pais %>')">
+                                        Editar
+                                    </button>
+                                    <form action="eliminar-desarrollador" method="POST" class="inline">
+                                        <input type="hidden" name="_id" id="_id" value="<%= desarrollador._id %>">
+                                        <button class="text-red-500 hover:underline ml-4" type="submit" aria-label="Eliminar Desarrollador">
+                                            Eliminar
+                                        </button>
+                                    </form>
+                                    
+                                </td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            <% } else { %>
+                <h1 class="text-center text-gray-500">No hay desarrolladores</h1>
+            <% } %>
+        </div>
+
+        <!-- Include the modal here -->
+        <%- include('../includes/modal-editar-desa-admin.ejs') %>
+
+    <%- include('../includes/footer.ejs') %>
+</main>
+<%- include('../includes/end.ejs') %>
+
+<script>
+    function openEditModal(nombre, imagen, descripcion, id, fechaFundacion, pais) {
+        document.getElementById('edit-modal').classList.remove('hidden');
+        document.getElementById('edit-nombre').value = nombre;
+        document.getElementById('edit-descripcion').value = descripcion;
+        document.getElementById('edit-id').value = id;        
+        document.getElementById('edit-pais').value = pais;
+        document.getElementById('edit-fechaFundacion').value = fechaFundacion;
+    }
+    function closeEditModal() {
+        document.getElementById('edit-modal').classList.add('hidden');
+    }
+</script>

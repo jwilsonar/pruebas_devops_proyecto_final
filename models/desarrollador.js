@@ -12,6 +12,9 @@ const desarrolladorSchema = new Schema({
         type: String,
         required: true
     },
+    imagen: {
+        type: String,
+    },
     fechaFundacion: Date,
     descripcion: String,
     juegosDesarrollados: [{
@@ -20,9 +23,10 @@ const desarrolladorSchema = new Schema({
     }]
 });
 
-desarrolladorSchema.pre('save', function(next) {
-    if (!this.slug) {
-        this.slug = slugify(`${this.nombre}`, { lower: true });
+// Middleware para generar el slug antes de la validación
+desarrolladorSchema.pre('validate', function (next) {
+    if (!this.slug && this.nombre) {
+        this.slug = slugify(this.nombre, { lower: true });
     }
     next();
 });

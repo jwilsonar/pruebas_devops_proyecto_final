@@ -1,40 +1,78 @@
 <%- include('../includes/head.ejs') %>
-    <link rel="stylesheet" href="/css/producto.css">
 </head>
 
-<body class="bg-gray-100">
-    <%- include('../includes/navigation.ejs') %>
+<body class="bg-gray-200">
+    <%- include('../includes/navigation-admin.ejs') %>
+    <main class="flex flex-col min-h-screen max-w-aministrador right-0 absolute w-full">        
+        <div class="container mx-auto flex-1">
+            <h1 class="text-2xl font-semibold mb-5 mt-5">Juegos</h1>
+            <%- include('../includes/modal-crear-prod-admin.ejs') %>
+            <% if (prods.length > 0) { %>
+                <table class="table-auto border-collapse border border-gray-200>
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Nombre</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Imagen</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Precio</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Descripción</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Estado</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Stock</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Limite Compra</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Categoria</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Marca</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Tags</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Valoración</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Ventas</th>
+                            <th class="border border-gray-300 px-4 py-2 text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% for (let producto of prods) { %>
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="border border-gray-300 px-4 py-2"><%= producto.nombre %></td>
+                                <td class="border border-gray-300 px-4 py-2">
+                                    <% if (producto.imagen_portada) { %>
+                                        <img src="/<%= producto.imagen_portada %>" alt="<%= producto.nombre %>" class="w-20 h-20 object-cover rounded-md">
+                                    <% } else { %>
+                                        <span class="text-gray-500">No disponible</span>
+                                    <% } %>
+                                </td>
+                                <td class="border border-gray-300 px-4 py-2">S/ <%= producto.precio %></td>
+                                <td class="border border-gray-300 px-4 py-2 max-w-[250px] overflow-hidden whitespace-nowrap text-ellipsis"><%= producto.descripcion %></td>
+                                <td class="border border-gray-300 px-4 py-2"><%= producto.estado %></td>
+                                <td class="border border-gray-300 px-4 py-2"><%= producto.stock %></td>
+                                <td class="border border-gray-300 px-4 py-2"><%= producto.limiteCompra %></td>
+                                <td class="border border-gray-300 px-4 py-2">
+                                    <% if (producto.categoria && producto.categoria.idCategoria) { %>
+                                        <%= producto.categoria.idCategoria %>
+                                    <% } else { %>
+                                        <span class="text-gray-500">No asignada</span>
+                                    <% } %>
+                                </td>
+                                <td class="border border-gray-300 px-4 py-2"><%= producto.marca || 'No disponible' %></td>
+                                <td class="border border-gray-300 px-4 py-2 max-w-[250px] overflow-hidden whitespace-nowrap text-ellipsis">
+                                    <% if (producto.tags && producto.tags.length > 0) { %>
+                                        <%= producto.tags.join(', ') %>
+                                    <% } else { %>
+                                        <span class="text-gray-500">Sin tags</span>
+                                    <% } %>
+                                </td>
+                                <td class="border border-gray-300 px-4 py-2"><%= producto.valoracion %></td>
+                                <td class="border border-gray-300 px-4 py-2"><%= producto.cantidadVentas %></td>
+                                <td class="border border-gray-300 px-4 py-2 text-center">
+                                    <a href="/admin/productos/<%= producto._id %>">Ver detalle</a>
+                                    <button class="text-red-500 hover:underline ml-4">Eliminar</button>
+                                </td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            <% } else { %>
+                <h1 class="text-center text-gray-500">No hay productos</h1>
+            <% } %>
+            
+        </div>
     
-    <main class="container mx-auto mt-5">
-        <h1 class="text-xl font-semibold">Productos</h1>
-        <% if (prods.length > 0) { %>
-            <div class="flex gap-4">
-                <% for (let producto of prods) { %>
-                    <article class="bg-white shadow-lg rounded-lg overflow-hidden transition-transform transform hover:scale-105 w-[250px]">
-                        <header class="bg-gray-100 p-4">
-                            <h1 class="text-xl font-semibold text-gray-800 truncate"><%= producto.nombre %></h1>
-                        </header>
-                        <div class="card__image">
-                            <img src="<%= producto.urlImagen %>" alt="<%= producto.nombre %>" class="w-full h-48 object-cover">
-                        </div>
-                        <div class="p-4">
-                            <h2 class="text-lg font-bold text-gray-900">S/<%= producto.precio %></h2>
-                            <p class="text-gray-600 mt-1 line-clamp-3"><%= producto.descripcion %></p>
-                        </div>
-                        <div class="flex justify-between items-center p-4 border-t border-gray-200">
-                            <a href="/admin/editar-producto/<%= producto.id %>?editar=true" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors">Editar</a>
-                            <form action="/admin/eliminar-producto" method="POST">
-                                <input type="hidden" value="<%= producto.id %>" name="idProducto">
-                                <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors" type="submit">Eliminar</button>
-                            </form>
-                        </div>
-                    </article>
-                    
-                <% } %>
-            </div>
-        <% } else { %>
-            <h1>No hay productos</h1>
-        <% } %>
-    </main>
-    
+    <%- include('../includes/footer.ejs') %>
+</main>
 <%- include('../includes/end.ejs') %>

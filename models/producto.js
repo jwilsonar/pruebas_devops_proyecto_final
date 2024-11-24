@@ -36,9 +36,7 @@ const productoSchema = new Schema({
         type: String,
         default: 'unidad'
     },
-    categoria: {
-        idCategoria: { type: Schema.Types.ObjectId, ref: 'Categoria', required: true },
-    },
+    idCategoria: { type: Schema.Types.ObjectId, ref: 'Categoria', required: true },
     marca: {
         type: String
     },
@@ -69,15 +67,11 @@ const productoSchema = new Schema({
         type: Number,
         default: 0
     },
-    desarrollador:{
-        idDesarrollador: {type: Schema.Types.ObjectId, ref: 'Desarrollador', required: true}
-    },
-    plataforma:{
-        idPlataforma: {type: Schema.Types.ObjectId, ref: 'Plataforma', required: true}
-    },
-    genero:{
-        idGenero: {type: Schema.Types.ObjectId, ref: 'Genero', required: true}
-    },
+    
+    idDesarrollador: {type: Schema.Types.ObjectId, ref: 'Desarrollador', required: true},
+    idPlataforma: {type: Schema.Types.ObjectId, ref: 'Plataforma', required: true},
+    idGenero: {type: Schema.Types.ObjectId, ref: 'Genero', required: true},
+
     cantidadVentas: {
         type: Number,
         default: 0
@@ -117,6 +111,12 @@ productoSchema.pre('save', function(next) {
     }
     next();
 });
-
+// Middleware para generar el slug antes de la validación
+productoSchema.pre('validate', function (next) {
+    if (!this.slug && this.nombre) {
+        this.slug = slugify(this.nombre, { lower: true });
+    }
+    next();
+});
 
 module.exports = mongoose.model('Producto', productoSchema);

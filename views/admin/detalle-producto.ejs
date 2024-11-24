@@ -1,0 +1,147 @@
+<%- include('../includes/head.ejs') %>
+</head>
+
+<body class="bg-gray-200">
+    <%- include('../includes/navigation-admin.ejs') %>
+    <main class="flex flex-col min-h-screen max-w-aministrador right-0 absolute w-full py-5">        
+        <div class="container mx-auto flex-1 my-5">
+            <div class="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">Editar Producto</h2>
+                <img src="/<%= producto.imagen_portada %>" alt="" class="mb-5">
+                <form action="/productos/<%= producto._id || '' %>" method="POST" class="space-y-6">
+                    <!-- Nombre -->
+                    <div>
+                        <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
+                        <input 
+                            type="text" 
+                            id="nombre" 
+                            name="nombre" 
+                            value="<%= producto.nombre %>" 
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" 
+                            required 
+                        />
+                    </div>
+                    <!-- Descripción -->
+                    <div>
+                        <label for="descripcion" class="block text-sm font-medium text-gray-700">Descripción</label>
+                        <textarea 
+                            id="descripcion" 
+                            name="descripcion" 
+                            rows="4" 
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" 
+                            required
+                        ><%= producto.descripcion %></textarea>
+                    </div>
+                    <!-- Precio -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="precio" class="block text-sm font-medium text-gray-700">Precio</label>
+                            <input 
+                                type="number" 
+                                id="precio" 
+                                name="precio" 
+                                step="0.01" 
+                                value="<%= producto.precio %>" 
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" 
+                                required 
+                            />
+                        </div>
+                        <div>
+                            <label for="precioDescuento" class="block text-sm font-medium text-gray-700">Precio con descuento</label>
+                            <input 
+                                type="number" 
+                                id="precioDescuento" 
+                                name="precioDescuento" 
+                                step="0.01" 
+                                value="<%= producto.precioDescuento || '' %>" 
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" 
+                            />
+                        </div>
+                    </div>
+                    <!-- Estado -->
+                    <div>
+                        <label for="estado" class="block text-sm font-medium text-gray-700">Estado</label>
+                        <select 
+                            id="estado" 
+                            name="estado" 
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        >
+                            <option value="activo" <%= producto.estado === 'activo' ? 'selected' : '' %>>Activo</option>
+                            <option value="inactivo" <%= producto.estado === 'inactivo' ? 'selected' : '' %>>Inactivo</option>
+                            <option value="agotado" <%= producto.estado === 'agotado' ? 'selected' : '' %>>Agotado</option>
+                        </select>
+                    </div>
+                    <!-- Stock y Límite de compra -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="stock" class="block text-sm font-medium text-gray-700">Stock</label>
+                            <input 
+                                type="number" 
+                                id="stock" 
+                                name="stock" 
+                                value="<%= producto.stock %>" 
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" 
+                                required 
+                            />
+                        </div>
+                        <div>
+                            <label for="limiteCompra" class="block text-sm font-medium text-gray-700">Límite de compra</label>
+                            <input 
+                                type="number" 
+                                id="limiteCompra" 
+                                name="limiteCompra" 
+                                value="<%= producto.limiteCompra || 10 %>" 
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" 
+                            />
+                        </div>
+                    </div>
+                    <!-- Tags -->
+                    <div>
+                        <label for="tags" class="block text-sm font-medium text-gray-700">Tags</label>
+                        <input 
+                            type="text" 
+                            id="tags" 
+                            name="tags" 
+                            value="<%= producto.tags ? producto.tags.join(', ') : '' %>" 
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" 
+                            placeholder="Ejemplo: tecnología, gaming, portátil" 
+                        />
+                    </div>
+                    <!-- Imagen portada -->
+                    <div>
+                        <label for="imagen_portada" class="block text-sm font-medium text-gray-700">Imagen de portada</label>
+                        <input 
+                            type="file" 
+                            id="imagen_portada" 
+                            name="imagen_portada" 
+                            required 
+                        />
+                    </div>
+                    <div>
+                        <label for="genero" class="block text-sm font-medium text-gray-700">Genero</label>
+                        <input 
+                            type="text" 
+                            id="genero" 
+                            name="genero" 
+                            value="<%= producto.idGenero.nombre %>"
+                            required 
+                        />
+                    </div>
+                    <!-- Botón enviar -->
+                    <div>
+                        <button 
+                            type="submit" 
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        >
+                            Guardar Producto
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            
+        </div>
+    
+    <%- include('../includes/footer.ejs') %>
+</main>
+<%- include('../includes/end.ejs') %>
