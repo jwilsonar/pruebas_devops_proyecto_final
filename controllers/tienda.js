@@ -97,13 +97,32 @@ exports.postCarrito = (req, res, next) => {
 
 exports.postEliminarProductoCarrito = (req, res, next) => {
   const idProducto = req.body.idProducto;
-  req.usuario
-    .deleteItemDelCarrito(idProducto)
-    .then(result => {
-      res.redirect('/carrito');
+
+  Producto.findById(idProducto)
+    .then(producto => {
+      if (!producto) {
+        console.error('Producto no encontrado');
+        return res.redirect('/'); // Redirige si no se encuentra el producto
+      }
+
+      return Usuario.findById(req.session.usuario._id).then(usuario => {
+        if (!usuario) {
+          console.error('Usuario no encontrado');
+          return res.redirect('/');
+        }
+
+        return usuario.deleteItemDelCarrito(producto);
+      });
     })
-    .catch(err => console.log(err));
+    .then(() => {
+      res.redirect('/carrito'); // Redirige después de eliminar el producto
+    })
+    .catch(err => {
+      console.error('Error al eliminar el producto del carrito:', err);
+      res.redirect('/'); // Redirige en caso de cualquier error
+    });
 };
+
 
 exports.postPedido = (req, res, next) => {
   req.usuario
