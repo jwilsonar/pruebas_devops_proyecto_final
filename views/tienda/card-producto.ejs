@@ -1,0 +1,28 @@
+<% if (productos.length > 0) { %>
+<div class="flex gap-4">
+    <% for (let producto of productos) { %>
+        <a href="/productos/<%= producto.slug %>">
+            <article class="bg-white shadow-lg rounded-lg overflow-hidden p-4 border border-gray-200 transition-transform transform hover:scale-105 w-[250px] flex flex-col items-center justify-center gap-4">
+                <header class="mb-4">
+                    <h1 class="text-xl font-semibold text-gray-800 truncate text-center"><%= producto.nombre %></h1>
+                </header>
+                <div class="mb-4">
+                    <img src="/<%= producto.imagen_portada %>" alt="<%= producto.nombre %>" class="w-full h-48 object-cover rounded-md">
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold text-gray-900">S/ <%= producto.precio %></h2>
+                    <p class="text-gray-600 mt-1 line-clamp-3"><%= producto.descripcion %></p>
+                </div>
+                <% if(autenticado && tipoUsuario === 'user'){%>
+                <div class="card__actions">
+                    <%- include('../includes/agregar-al-carrito.ejs', {producto: producto}) %>
+                </div>
+                <% }%>
+            </article>
+        </a>
+        
+    <% } %>
+</div>
+<% } else { %>
+<h1>No hay productos</h1>
+<% } %>

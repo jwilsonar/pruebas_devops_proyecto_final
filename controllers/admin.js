@@ -5,7 +5,7 @@ const Genero = require('../models/genero');
 const Producto = require('../models/producto');
 const fileHelper = require ('../utils/fileHelper')
 const axios = require('axios')
-
+const Pedido = require('../models/pedido')
 exports.getIndexAdmin = (req, res) => {
 
   // Usamos Promise.all para ejecutar las consultas de manera paralela
@@ -94,51 +94,104 @@ exports.postCrearProducto = (req, res, next) => {
 exports.getDetalleProducto = (req, res, next) => {
   const idProducto = req.params.idProducto;
 
+  // Buscar el producto por ID con los datos relacionados poblados
   Producto.findById(idProducto)
-    .populate('idGenero') // Población para el campo idGenero
-    .populate('idPlataforma') // Población para el campo idPlataforma
-    .populate('idCategoria') // Población para el campo idCategoria
-    .populate('idDesarrollador') // Población para el campo idDesarrollador
-    .populate('idUsuario') // Población para el campo idUsuario
     .then(producto => {
       if (!producto) {
-        return res.redirect('admin');
+        return res.redirect('/admin');
       }
-      console.log(producto);
-      res.render('admin/detalle-producto', {
-        titulo: 'Editar Producto',
-        path: '/admin/detalle-producto',
-        modoEdicion: true,
-        producto: producto,
+      console.log(producto)
+      // Obtener datos adicionales
+      return Promise.all([
+        Categoria.find(), // Obtener categorías
+        Desarrollador.find(), // Obtener desarrolladores
+        Plataforma.find(), // Obtener plataformas
+        Genero.find() // Obtener géneros
+      ]).then(([categorias, desarrolladores, plataformas, generos]) => {
+        // Renderizar la vista con los datos necesarios
+        console.log(generos)
+        res.render('admin/detalle-producto', {
+          titulo: 'Editar Producto',
+          path: '/admin/detalle-producto',
+          modoEdicion: true,
+          producto: producto,
+          categorias: categorias,
+          desarrolladores: desarrolladores,
+          plataformas: plataformas,
+          generos: generos
+        });
       });
     })
-    .catch(err => console.error(err));
+    .catch(err => {
+      console.error(err);
+      res.status(500).send('Error interno del servidor');
+    });
 };
 
 
 
 
+
 exports.postEditarProducto = (req, res, next) => {
-  const idProducto = req.body.idProducto;
+  const idProducto = req.body._id;
   const nombre = req.body.nombre;
   const precio = req.body.precio;
-  const urlImagen = req.body.urlImagen;
   const descripcion = req.body.descripcion;
+  const stock = req.body.stock;
+  const imagen = req.file;
+  const categoria = req.body.categoria;
+  const marca = req.body.marca;
+  const tags = req.body.tags ? req.body.tags.split(',') : [];  // Si hay tags, separarlos por coma
+  const desarrollador = req.body.desarrollador;
+  const plataforma = req.body.plataforma;
+  const genero = req.body.genero;
+  const precioDescuento = req.body.precioDescuento
+  const estado = req.body.estado
+
+  console.log(idProducto)
+  // Validar que `idProducto` exista
+  if (!idProducto) {
+      return res.status(400).send("ID de producto no proporcionado");
+  }
 
   Producto.findById(idProducto)
-    .then(producto => {
-      producto.nombre = nombre;
-      producto.precio = precio;
-      producto.descripcion = descripcion;
-      producto.urlImagen = urlImagen;
-      return producto.save();
-    })
-    .then(result => {
-      console.log('PRODUCTO GUARDADO!');
-      res.redirect('/admin/productos');
-    })
-    .catch(err => console.log(err));
-}; 
+      .then(producto => {
+          if (!producto) {
+              return res.status(404).send("Producto no encontrado");
+          }
+
+          // Actualizar los campos del producto
+          producto.nombre = nombre;
+          producto.precio = precio;
+          producto.descripcion = descripcion;
+          producto.stock = stock;
+          producto.idCategoria = categoria;
+          producto.marca = marca;
+          producto.idDesarrollador = desarrollador;
+          producto.idPlataforma = plataforma;
+          producto.idGenero = genero
+          producto.precioDescuento = precioDescuento;
+          producto.estado = estado
+
+          // Manejar la imagen (reemplazar si hay nueva imagen, conservar la existente si no hay nueva imagen)
+          if (imagen) {
+            fileHelper.deleteFile(producto.imagen_portada)
+              producto.imagen_portada = imagen.path;
+          }
+
+          // Guardar el producto actualizado
+          return producto.save();
+      })
+      .then(result => {
+          console.log("Producto actualizado correctamente:", result);
+          res.redirect("/admin/productos");
+      })
+      .catch(err => {
+          console.error("Error al actualizar el producto:", err);
+          res.status(500).send("Error al actualizar el producto");
+      });
+};
+
 
 exports.getProductos = (req, res, next) => {
   Promise.all([
@@ -597,4 +650,17 @@ exports.postEliminarGenero=(req, res, next)=>{
       res.status(500).send("Hubo un error al crear la genero.");
     }
   )
+}
+
+exports.getPedidos=(req, res, next)=>{
+  Pedido.find().then(pedidos=>{
+    let ped=[];
+    if(pedidos) ped=pedidos;
+    res.render('admin/pedidos',{
+      titulo: "Pedidos",
+      path:'admin/pedidos',
+      pedidos: ped,
+      usuario: req.session.usuario
+    })
+  })
 }

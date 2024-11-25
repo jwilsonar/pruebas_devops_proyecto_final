@@ -11,7 +11,7 @@
             </div>
             <img src="https://cdn2.unrealengine.com/Epic+Games+Node%2Ffn-1920x1080-05e434e24b3170bc6cc6003c102270ee4cde3a75.jpg?resize=1&w=1920" alt="">
         </div>
-        <div class="container mx-auto">
+        <div class="container mx-auto mb-5">
             <h1 class="text-2xl font-semibold mb-5">Popular</h1>
                 
             <% if (prods.length > 0) { %>
@@ -22,7 +22,7 @@
                                 <h1 class="text-xl font-semibold text-gray-800 truncate text-center"><%= producto.nombre %></h1>
                             </header>
                             <div class="mb-4">
-                                <img src="<%= producto.urlImagen %>" alt="<%= producto.nombre %>" class="w-full h-48 object-cover rounded-md">
+                                <img src="/<%= producto.imagen_portada %>" alt="<%= producto.nombre %>" class="w-full h-48 object-cover rounded-md">
                             </div>
                             <div>
                                 <h2 class="text-lg font-bold text-gray-900">S/ <%= producto.precio %></h2>

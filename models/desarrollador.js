@@ -15,6 +15,9 @@ const desarrolladorSchema = new Schema({
     imagen: {
         type: String,
     },
+    slug: {
+        type: String,
+    },
     fechaFundacion: Date,
     descripcion: String,
     juegosDesarrollados: [{

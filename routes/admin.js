@@ -47,5 +47,6 @@ router.post('/crear-genero', adminController.postCrearGenero);
 router.post('/editar-genero', adminController.postEditarGenero);
 router.post('/eliminar-genero', adminController.postEliminarGenero);
 
+router.get('/pedidos', adminController.getPedidos)
 
 module.exports = router;

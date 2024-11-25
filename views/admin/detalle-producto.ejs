@@ -3,13 +3,15 @@
 
 <body class="bg-gray-200">
     <%- include('../includes/navigation-admin.ejs') %>
-    <main class="flex flex-col min-h-screen max-w-aministrador right-0 absolute w-full py-5">        
+    <main class="flex flex-col min-h-screen max-w-aministrador right-0 absolute w-full">        
         <div class="container mx-auto flex-1 my-5">
             <div class="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
                 <h2 class="text-2xl font-bold mb-6 text-gray-800">Editar Producto</h2>
+                <a href="/admin/productos"><button class="px-8 py-1 rounded-full bg-blue-700 text-white mb-5"> < Volver</button></a>
                 <img src="/<%= producto.imagen_portada %>" alt="" class="mb-5">
-                <form action="/productos/<%= producto._id || '' %>" method="POST" class="space-y-6">
+                <form action="/admin/editar-producto" method="POST" class="space-y-6" enctype="multipart/form-data">
                     <!-- Nombre -->
+                    <input type="hidden" name="_id" id="_id" value="<%= producto._id %>">
                     <div>
                         <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
                         <input 
@@ -109,23 +111,60 @@
                     </div>
                     <!-- Imagen portada -->
                     <div>
-                        <label for="imagen_portada" class="block text-sm font-medium text-gray-700">Imagen de portada</label>
+                        <label for="imagen" class="block text-sm font-medium text-gray-700">Imagen de portada</label>
                         <input 
                             type="file" 
-                            id="imagen_portada" 
-                            name="imagen_portada" 
-                            required 
+                            id="imagen" 
+                            name="imagen"                              
                         />
                     </div>
                     <div>
                         <label for="genero" class="block text-sm font-medium text-gray-700">Genero</label>
-                        <input 
-                            type="text" 
-                            id="genero" 
-                            name="genero" 
-                            value="<%= producto.idGenero.nombre %>"
-                            required 
-                        />
+                        <select name="genero" id="genero">
+                            <% for (let genero of generos) { %>
+                                <option 
+                                value="<%= genero._id %>" 
+                                <%= producto.idGenero.toString() === genero._id.toString() ? 'selected' : '' %>>
+                                <%= genero.nombre %>
+                                </option>
+                            <% } %>
+                        </select>                          
+                    </div>
+                    <div>
+                        <label for="plataforma" class="block text-sm font-medium text-gray-700">Plataforma</label>
+                        <select name="plataforma" id="plataforma">
+                            <% for (let plataforma of plataformas) { %>
+                                <option 
+                                value="<%= plataforma._id %>" 
+                                <%= producto.idPlataforma.toString() === plataforma._id.toString() ? 'selected' : '' %>>
+                                <%= plataforma.nombre %>
+                                </option>
+                            <% } %>
+                        </select>                          
+                    </div>
+                    <div>
+                        <label for="categoria" class="block text-sm font-medium text-gray-700">categoria</label>
+                        <select name="categoria" id="categoria">
+                            <% for (let categoria of categorias) { %>
+                                <option 
+                                value="<%= categoria._id %>" 
+                                <%= producto.idCategoria.toString() === categoria._id.toString() ? 'selected' : '' %>>
+                                <%= categoria.nombre %>
+                                </option>
+                            <% } %>
+                        </select>                          
+                    </div>
+                    <div>
+                        <label for="desarrollador" class="block text-sm font-medium text-gray-700">desarrollador</label>
+                        <select name="desarrollador" id="desarrollador">
+                            <% for (let desarrollador of desarrolladores) { %>
+                                <option 
+                                value="<%= desarrollador._id %>" 
+                                <%= producto.idDesarrollador.toString() === desarrollador._id.toString() ? 'selected' : '' %>>
+                                <%= desarrollador.nombre %>
+                                </option>
+                            <% } %>
+                        </select>                          
                     </div>
                     <!-- Botón enviar -->
                     <div>

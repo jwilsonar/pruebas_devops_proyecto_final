@@ -1,12 +1,15 @@
 const Producto = require('../models/producto');
 const Pedido = require('../models/pedido');
-
+const Usuario = require('../models/usuario')
+const Categoria = require('../models/categoria')
+const Genero = require('../models/genero');
+const Desarrollador = require('../models/desarrollador');
 
 exports.getProductos = (req, res, next) => {
   Producto.find()
     .then(productos => {
       res.render('tienda/lista-productos', {
-        prods: productos,
+        productos: productos,
         titulo: 'Todos los Productos',
         path: '/productos',
         autenticado: req.session.autenticado,
@@ -19,13 +22,14 @@ exports.getProductos = (req, res, next) => {
 };
 
 exports.getProducto = (req, res, next) => {
-  const idProducto = req.params.idProducto;
-  Producto.findById(idProducto)
+  Producto.findOne({slug: req.params.slug})
     .then(producto => {
       res.render('tienda/detalle-producto', {
         producto: producto,
         titulo: producto.nombre,
-        path: '/productos'
+        path: '/productos',
+        autenticado: req.session.autenticado,
+        tipoUsuario: req.session.tipoUsuario
       });
     })
     .catch(err => console.log(err));
@@ -49,8 +53,8 @@ exports.getIndex = (req, res, next) => {
 };
 
 exports.getCarrito = (req, res, next) => {
-  req.usuario
-    .populate('carrito.items.idProducto')
+  Usuario.findById(req.session.usuario._id).then(user=>{
+    user.populate('carrito.items.idProducto')
     .then(usuario => {
       const productos = usuario.carrito.items;
       console.log("Carrito")
@@ -65,17 +69,25 @@ exports.getCarrito = (req, res, next) => {
       res.render('tienda/carrito', {
         path: '/carrito',
         titulo: 'Mi Carrito',
-        carrito: carrito
+        carrito: carrito,
+        autenticado: req.session.autenticado,
+        tipoUsuario: req.session.tipoUsuario
       });
     })
-    .catch(err => console.log(err));
+    .catch(err => console.log(err))})
 };
 
 exports.postCarrito = (req, res, next) => {
   const idProducto = req.body.idProducto;
   Producto.findById(idProducto)
     .then(producto => {
-      return req.usuario.agregarAlCarrito(producto);
+      if(!producto) res.redirect('/');
+      return Usuario.findById(req.session.usuario._id).then(usuario=>{
+        return usuario.agregarAlCarrito(producto);
+      }).catch(err=>{
+        console.log("Error al agregar al carrito")
+        res.redirect('/')
+      })
     })
     .then(result => {
       console.log(result);
@@ -139,3 +151,96 @@ exports.getCheckout = (req, res, next) => {
   });
 }; 
 
+exports.getCategorias=(req, res, next)=>{
+  Categoria.find().then(categorias => {
+    let cat = []
+    if(categorias) cat=categorias;
+    res.render('tienda/categorias',{
+      titulo: 'Categorías',
+      categorias: cat,
+      path: 'tienda/categorias',
+      autenticado: req.session.autenticado,
+      tipoUsuario: req.session.tipoUsuario
+    })
+  })
+}
+
+exports.getCategoria=(req, res, next)=>{
+  Categoria.findOne({slug: req.params.slug}).then(categoria => {
+    Producto.find({idCategoria: categoria._id}).then(productos=>{
+      let prods = []
+      if(productos) prods = productos;
+      res.render('tienda/detalle-categoria',{
+        titulo: 'Categoría Interna',
+        productos: prods,
+        path: 'tienda/categorias',
+        autenticado: req.session.autenticado,
+        tipoUsuario: req.session.tipoUsuario
+      })
+    })
+    
+  })
+}
+
+exports.getGeneros=(req, res, next)=>{
+  Genero.find().then(generos => {
+    let gene = []
+    if(generos) gene=generos;
+    res.render('tienda/generos',{
+      titulo: 'Categorías',
+      generos: gene,
+      path: 'tienda/generos',
+      autenticado: req.session.autenticado,
+      tipoUsuario: req.session.tipoUsuario
+    })
+  })
+}
+
+
+exports.getGenero=(req, res, next)=>{
+  Genero.findOne({slug: req.params.slug}).then(genero => {
+    Producto.find({idGenero: genero._id}).then(productos=>{
+      let prods = []
+      if(productos) prods = productos;
+      res.render('tienda/detalle-genero',{
+        titulo: 'Categoría Interna',
+        productos: prods,
+        path: 'tienda/generos',
+        autenticado: req.session.autenticado,
+        tipoUsuario: req.session.tipoUsuario
+      })
+    })
+    
+  })
+}
+
+exports.getDesarrolladores=(req, res, next)=>{
+  Desarrollador.find().then(desarrolladors => {
+    let desa = []
+    if(desarrolladors) desa=desarrolladors;
+    res.render('tienda/desarrolladores',{
+      titulo: 'Desarrolladores',
+      desarrolladores: desa,
+      path: 'tienda/desarrolladores',
+      autenticado: req.session.autenticado,
+      tipoUsuario: req.session.tipoUsuario
+    })
+  })
+}
+
+exports.getDesarrollador=(req, res, next)=>{
+  Desarrollador.findOne({slug: req.params.slug}).then(desarrollador => {
+    Producto.find({idDesarrollador: desarrollador._id}).then(productos=>{
+      let prods = []
+      if(productos) prods = productos;
+      res.render('tienda/detalle-desarrollador',{
+        titulo: 'Desarrollador Interna',
+        productos: prods,
+        path: 'tienda/generos',
+        autenticado: req.session.autenticado,
+        tipoUsuario: req.session.tipoUsuario
+      })
+    })
+    
+  })
+}

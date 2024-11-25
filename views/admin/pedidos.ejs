@@ -1,0 +1,68 @@
+<%- include('../includes/head.ejs') %>
+</head>
+
+<body class="bg-gray-200 ">
+    <%- include('../includes/navigation-admin.ejs') %>
+    <main class="flex flex-col min-h-screen max-w-aministrador right-0 absolute w-full">        
+        <div class="container mx-auto flex-1">
+            <h1 class="text-2xl font-semibold mb-5 mt-5">Pedidos</h1>
+            <% if (pedidos.length > 0) { %>
+                <table class="table-auto border-collapse border border-gray-200 w-full">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Nombre</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Imagen</th>                            
+                            <th class="border border-gray-300 px-4 py-2 text-left">Descripción</th>
+                            <th class="border border-gray-300 px-4 py-2 text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% for (let pedido of pedidos) { %>
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="border border-gray-300 px-4 py-2"><%= pedido.nombre %></td>
+                                <td class="border border-gray-300 px-4 py-2">
+                                    <img src="/<%= pedido.imagen %>" alt="<%= pedido.nombre %>" class="w-20 h-20 object-cover rounded-md">
+                                </td>                        
+                                <td class="border border-gray-300 px-4 py-2 max-w-[250px] overflow-hidden whitespace-nowrap text-ellipsis"><%= pedido.descripcion %></td>
+                                <td class="border border-gray-300 px-4 py-2 text-center">
+                                    <button 
+                                        class="ml-4 text-blue-500 hover:underline"
+                                        type="button" 
+                                        onclick="openEditModal('<%= pedido.nombre %>', '<%= pedido.imagen %>', '<%= pedido.descripcion %>', '<%= pedido._id %>')">
+                                        Editar
+                                    </button>
+                                    <form action="eliminar-pedido" method="POST" class="inline">
+                                        <input type="hidden" name="_id" id="_id" value="<%= pedido._id %>">
+                                        <button class="text-red-500 hover:underline ml-4" type="submit" aria-label="Eliminar categoría">
+                                            Eliminar
+                                        </button>
+                                    </form>
+                                    
+                                </td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            <% } else { %>
+                <h1 class="text-center text-gray-500">No hay categorías</h1>
+            <% } %>
+        </div>
+
+        <!-- Include the modal here -->
+        <%- include('../includes/modal-editar-cat-admin.ejs') %>
+
+    <%- include('../includes/footer.ejs') %>
+</main>
+<%- include('../includes/end.ejs') %>
+
+<script>
+    function openEditModal(nombre, imagen, descripcion, id) {
+        document.getElementById('edit-modal').classList.remove('hidden');
+        document.getElementById('edit-nombre').value = nombre;
+        document.getElementById('edit-descripcion').value = descripcion;
+        document.getElementById('edit-id').value = id;
+    }
+    function closeEditModal() {
+        document.getElementById('edit-modal').classList.add('hidden');
+    }
+</script>

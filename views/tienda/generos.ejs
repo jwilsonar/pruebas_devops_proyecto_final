@@ -1,0 +1,35 @@
+<%- include('../includes/head.ejs') %>
+</head>
+
+<body class="bg-gray-200 flex flex-col min-h-screen">
+    <%- include('../includes/navigation.ejs') %>
+    <main class="flex-1">
+        <div class="container mx-auto mb-5">
+            <h1 class="text-2xl font-semibold mb-5">Categorías</h1>
+                
+            <% if (generos.length > 0) { %>
+                <div class="flex gap-4">
+                    <% for (let genero of generos) { %>
+                        <a href="/generos/<%= genero.slug %>">
+                            <article class="bg-white shadow-lg rounded-lg overflow-hidden p-4 border border-gray-200 transition-transform transform hover:scale-105 w-[250px] flex flex-col items-center justify-center gap-4">
+                                <header class="mb-4">
+                                    <h1 class="text-xl font-semibold text-gray-800 truncate text-center"><%= genero.nombre %></h1>
+                                </header>
+                                <div class="mb-4">
+                                    <img src="/<%= genero.imagen %>" alt="<%= genero.nombre %>" class="w-full h-48 object-cover rounded-md">
+                                </div>
+                                <div>
+                                    <p class="text-gray-600 mt-1 line-clamp-3"><%= genero.descripcion %></p>
+                                </div>
+                            </article>
+                        </a>
+                        
+                    <% } %>
+                </div>
+            <% } else { %>
+                <h1>No hay productos</h1>
+            <% } %>
+        </div>
+    </main>
+    <%- include('../includes/footer.ejs') %>
+<%- include('../includes/end.ejs') %>

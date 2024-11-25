@@ -53,6 +53,22 @@ const store = new MongoDBStore({
 })
 app.use(session({ secret: 'valor secreto', resave: false, saveUninitialized: false, store: store }));
 app.use(flash());
+app.use((req, res, next) => {
+    if (!req.session.usuarioId) {
+        return next(); // Si no hay usuario en sesión, continúa
+    }
+    Usuario.findById(req.session.usuario._id)
+        .then(usuario => {
+            if (usuario) {
+                req.session.usuario = usuario; // Recupera y asigna como instancia del modelo
+            }
+            next();
+        })
+        .catch(err => {
+            console.error(err);
+            next(); // Manejo básico de errores
+        });
+});
 app.use(tiendaRoutes);
 app.use('/admin',adminRoutes);
 app.use(authRoutes);
