@@ -8,21 +8,8 @@ const isAuth = require('../middleware/is_auth');
 
 exports.getProductos = async (req, res) => {
     try {
-        const { categoria, marca } = req.query;
-        let filtro = {};
-
-        if (categoria) {
-            filtro.categoria = categoria;
-        }
-
-        if (marca) {
-            filtro.marca = marca;
-        }
-
-        const productos = await Producto.find(filtro);
-        res.status(200).json({
-            productos: productos
-        });
+        const productos = await Producto.find();
+        res.status(200).json({ productos });
     } catch (error) {
         res.status(500).json({
             mensaje: 'Error al obtener productos',
@@ -35,16 +22,40 @@ exports.getProducto = async (req, res) => {
     try {
         const producto = await Producto.findOne({ slug: req.params.slug });
         if (!producto) {
-            return res.status(404).json({
-                mensaje: 'Producto no encontrado'
-            });
+            return res.status(404).json({ mensaje: 'Producto no encontrado' });
         }
-        res.status(200).json({
-            producto: producto
-        });
+        res.status(200).json({ producto });
     } catch (error) {
         res.status(500).json({
             mensaje: 'Error al obtener el producto',
+            error: error.message
+        });
+    }
+};
+
+exports.getCategorias = async (req, res) => {
+    try {
+        const categorias = await Categoria.find();
+        res.status(200).json({ categorias });
+    } catch (error) {
+        res.status(500).json({
+            mensaje: 'Error al obtener categorías',
+            error: error.message
+        });
+    }
+};
+
+exports.getProductosPorCategoria = async (req, res) => {
+    try {
+        const categoria = await Categoria.findOne({ slug: req.params.slug });
+        if (!categoria) {
+            return res.status(404).json({ mensaje: 'Categoría no encontrada' });
+        }
+        const productos = await Producto.find({ idCategoria: categoria._id });
+        res.status(200).json({ productos });
+    } catch (error) {
+        res.status(500).json({
+            mensaje: 'Error al obtener productos por categoría',
             error: error.message
         });
     }
@@ -73,6 +84,7 @@ exports.getCarrito = async (req, res) => {
             }
         });
     } catch (error) {
+        console.error('Error al obtener carrito:', error);
         res.status(500).json({
             mensaje: 'Error al obtener el carrito',
             error: error.message
@@ -111,24 +123,8 @@ exports.postCarrito = async (req, res) => {
             });
         }
 
-        const itemCarrito = usuario.carrito.items.find(item => 
-            item.idProducto.toString() === idProducto
-        );
-
-        if (itemCarrito) {
-            if (producto.stock < (itemCarrito.cantidad + cantidad)) {
-                return res.status(400).json({
-                    mensaje: 'Stock insuficiente para la cantidad total',
-                    stockDisponible: producto.stock
-                });
-            }
-        }
-
-        producto.stock -= cantidad;
-        await producto.save();
-
-        await usuario.agregarAlCarrito(producto);
-
+        await usuario.agregarAlCarrito(producto, cantidad);
+        
         const carritoActualizado = await Usuario.findById(usuario._id)
             .populate('carrito.items.idProducto');
 
@@ -137,6 +133,7 @@ exports.postCarrito = async (req, res) => {
             carrito: carritoActualizado.carrito
         });
     } catch (error) {
+        console.error('Error al agregar al carrito:', error);
         res.status(500).json({
             mensaje: 'Error al agregar al carrito',
             error: error.message
@@ -144,49 +141,23 @@ exports.postCarrito = async (req, res) => {
     }
 };
 
-exports.postEliminarProductoCarrito = async (req, res) => {
+exports.eliminarDelCarrito = async (req, res) => {
     try {
-        if (!req.session || !req.session.autenticado || !req.session.usuario) {
-            return res.status(401).json({
-                mensaje: 'No autorizado'
-            });
-        }
-
         const { idProducto } = req.body;
-
-        const producto = await Producto.findById(idProducto);
-        if (!producto) {
-            return res.status(404).json({
-                mensaje: 'Producto no encontrado'
-            });
-        }
-
         const usuario = await Usuario.findById(req.session.usuario._id);
+        
         if (!usuario) {
             return res.status(404).json({
                 mensaje: 'Usuario no encontrado'
             });
         }
 
-        const itemCarrito = usuario.carrito.items.find(item => 
-            item.idProducto.toString() === idProducto
-        );
-
-        if (!itemCarrito) {
-            return res.status(404).json({
-                mensaje: 'Producto no encontrado en el carrito'
-            });
-        }
-
-        producto.stock += itemCarrito.cantidad;
-        await producto.save();
-
-        await usuario.deleteItemDelCarrito(idProducto);
-
+        await usuario.eliminarDelCarrito(idProducto);
         res.status(200).json({
             mensaje: 'Producto eliminado del carrito'
         });
     } catch (error) {
+        console.error('Error al eliminar del carrito:', error);
         res.status(500).json({
             mensaje: 'Error al eliminar del carrito',
             error: error.message
@@ -194,65 +165,42 @@ exports.postEliminarProductoCarrito = async (req, res) => {
     }
 };
 
-exports.postVaciarCarrito = async (req, res) => {
+exports.postPedido = async (req, res) => {
     try {
-        if (!req.session || !req.session.autenticado || !req.session.usuario) {
-            return res.status(401).json({
-                mensaje: 'No autorizado'
-            });
-        }
+        const usuario = await Usuario.findById(req.session.usuario._id)
+            .populate('carrito.items.idProducto');
 
-        const usuario = await Usuario.findById(req.session.usuario._id);
         if (!usuario) {
-            return res.status(404).json({
-                mensaje: 'Usuario no encontrado'
-            });
+            return res.status(404).json({ mensaje: 'Usuario no encontrado' });
         }
 
-        for (const item of usuario.carrito.items) {
-            const producto = await Producto.findById(item.idProducto);
-            if (producto) {
-                producto.stock += item.cantidad;
-                await producto.save();
-            }
-        }
+        const productos = usuario.carrito.items.map(i => ({
+            cantidad: i.cantidad,
+            producto: { ...i.idProducto._doc }
+        }));
 
+        const pedido = new Pedido({
+            usuario: {
+                nombre: usuario.nombres,
+                idUsuario: usuario._id
+            },
+            productos: productos
+        });
+
+        await pedido.save();
         await usuario.limpiarCarrito();
 
         res.status(200).json({
-            mensaje: 'Carrito vaciado exitosamente'
+            mensaje: 'Pedido creado exitosamente',
+            pedido
         });
     } catch (error) {
+        console.error('Error al crear pedido:', error);
         res.status(500).json({
-            mensaje: 'Error al vaciar el carrito',
+            mensaje: 'Error al crear el pedido',
             error: error.message
         });
     }
-};
-
-exports.postPedido = (req, res, next) => {
-    req.usuario
-        .populate('carrito.items.idProducto')
-        .then(usuario => {
-            const productos = usuario.carrito.items.map(i => {
-                return { cantidad: i.cantidad, producto: { ...i.idProducto._doc } };
-            });
-            const pedido = new Pedido({
-                usuario: {
-                    nombre: req.usuario.nombre,
-                    idUsuario: req.usuario
-                },
-                productos: productos
-            });
-            return pedido.save();
-        })
-        .then(result => {
-            return req.usuario.limpiarCarrito();
-        })
-        .then(() => {
-            res.redirect('/pedidos');
-        })
-        .catch(err => console.log(err));
 };
 
 exports.getPedidos = (req, res, next) => {
@@ -272,21 +220,6 @@ exports.getCheckout = (req, res, next) => {
         path: '/checkout',
         titulo: 'Checkout'
     });
-}; 
-
-exports.getCategorias = (req, res, next) => {
-    Categoria.find()
-        .then(categorias => {
-            res.status(200).json({
-                categorias: categorias || []
-            });
-        })
-        .catch(err => {
-            res.status(500).json({
-                mensaje: 'Error al obtener categorías',
-                error: err
-            });
-        });
 };
 
 exports.getCategoria = (req, res, next) => {

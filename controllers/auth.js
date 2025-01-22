@@ -1,11 +1,18 @@
 const Usuario = require('../models/usuario');
 const bcrypt = require('bcryptjs');
-const csrf = require('csurf');
 const { validationResult } = require('express-validator');
 const session = require('express-session');
 
 exports.login = async (req, res) => {
     try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ 
+                mensaje: 'Error de validación',
+                errores: errors.array() 
+            });
+        }
+
         const { email, password } = req.body;
         const usuario = await Usuario.findOne({ email });
 
@@ -14,6 +21,7 @@ exports.login = async (req, res) => {
                 mensaje: 'Email o contraseña incorrectos'
             });
         }
+
         const coincide = await bcrypt.compare(password, usuario.password);
         if (!coincide) {
             return res.status(422).json({
@@ -21,7 +29,6 @@ exports.login = async (req, res) => {
             });
         }
 
-        req.session.autenticado = true;
         req.session.usuario = {
             _id: usuario._id,
             email: usuario.email,
@@ -36,14 +43,14 @@ exports.login = async (req, res) => {
         });
 
         res.status(200).json({
+            mensaje: 'Inicio de sesión exitoso',
             usuario: {
-                id: usuario._id,
                 email: usuario.email,
                 tipoUsuario: usuario.tipoUsuario
-            },
-            csrfToken: req.csrfToken()
+            }
         });
     } catch (error) {
+        console.error('Error en login:', error);
         res.status(500).json({
             mensaje: 'Error al iniciar sesión',
             error: error.message
@@ -53,28 +60,15 @@ exports.login = async (req, res) => {
 
 exports.registro = async (req, res) => {
     try {
-        const { nombres, apellidos, email, password, telefono } = req.body;
-        // Validar campos requeridos
-        if (!nombres || !apellidos || !email || !password || !telefono) {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
             return res.status(422).json({
-                mensaje: 'Todos los campos son requeridos'
+                mensaje: 'Error de validación',
+                errores: errors.array()
             });
         }
-        // Validar email
-        const emailRegex = /^\S+@\S+\.\S+$/;
-        if (!emailRegex.test(email)) {
-            return res.status(422).json({
-                mensaje: 'Email inválido'
-            });
-        }
-        // Validar teléfono
-        const telefonoRegex = /^\d{9}$/;
-        const tel = telefono.toString().trim();
-        if (!telefonoRegex.test(tel)) {
-            return res.status(422).json({
-                mensaje: 'El teléfono debe tener 9 dígitos numéricos'
-            });
-        }
+
+        const { email, password, nombres, apellidos, telefono, tipoUsuario } = req.body;
 
         // Verificar si el usuario ya existe
         const usuarioExistente = await Usuario.findOne({ email });
@@ -84,42 +78,31 @@ exports.registro = async (req, res) => {
             });
         }
 
-        // Validar contraseña
-        if (password.length < 4) {
-            return res.status(422).json({
-                mensaje: 'La contraseña debe tener al menos 4 caracteres'
-            });
-        }
-
         const hashedPassword = await bcrypt.hash(password, 12);
         const usuario = new Usuario({
-            nombres,
-            apellidos,
             email,
             password: hashedPassword,
-            telefono: tel,
-            tipoUsuario: 'user',
+            nombres,
+            apellidos,
+            telefono,
+            tipoUsuario: tipoUsuario || 'cliente',
             carrito: { items: [] }
         });
 
-        const usuarioGuardado = await usuario.save();
+        await usuario.save();
 
         res.status(201).json({
             mensaje: 'Usuario creado exitosamente',
             usuario: {
-                id: usuarioGuardado._id,
-                email: usuarioGuardado.email
+                email: usuario.email,
+                nombres: usuario.nombres,
+                tipoUsuario: usuario.tipoUsuario
             }
         });
     } catch (error) {
         console.error('Error en registro:', error);
-        if (error.code === 11000) {
-            return res.status(422).json({
-                mensaje: 'El email ya está registrado'
-            });
-        }
         res.status(500).json({
-            mensaje: 'Error al crear usuario',
+            mensaje: 'Error al registrar usuario',
             error: error.message
         });
     }
@@ -128,11 +111,12 @@ exports.registro = async (req, res) => {
 exports.cerrarSesion = (req, res) => {
     req.session.destroy(err => {
         if (err) {
+            console.error('Error al cerrar sesión:', err);
             return res.status(500).json({
-                mensaje: 'Error al cerrar sesión',
-                error: err.message
+                mensaje: 'Error al cerrar sesión'
             });
         }
+        res.clearCookie('connect.sid');
         res.status(200).json({
             mensaje: 'Sesión cerrada exitosamente'
         });
@@ -140,5 +124,14 @@ exports.cerrarSesion = (req, res) => {
 };
 
 exports.getCsrfToken = (req, res) => {
-    res.status(200).json({ csrfToken: req.csrfToken() });
+    try {
+        const token = req.csrfToken();
+        res.status(200).json({ csrfToken: token });
+    } catch (error) {
+        console.error('Error al generar token CSRF:', error);
+        res.status(500).json({
+            mensaje: 'Error al generar token CSRF',
+            error: error.message
+        });
+    }
 };

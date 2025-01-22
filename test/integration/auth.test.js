@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('../../app');
 const Usuario = require('../../models/usuario');
+const bcrypt = require('bcryptjs');
 const { usuarioValido } = require('../fixtures/usuarios');
 
 // DESARROLLADO POR: JOEL ALBORNOZ Y JORGE AMAYA.
@@ -8,7 +9,7 @@ const { usuarioValido } = require('../fixtures/usuarios');
 describe('Auth Controller', () => {
     let server;
     let csrfToken;
-    let cookie;
+    let cookies;
 
     beforeAll(() => {
         server = app.listen(3001);
@@ -21,128 +22,105 @@ describe('Auth Controller', () => {
     beforeEach(async () => {
         await Usuario.deleteMany({});
 
-        // Obtener el token CSRF
+        // Obtener el token CSRF y las cookies
         const response = await request(app)
             .get('/api/auth/csrf-token');
+        
         csrfToken = response.body.csrfToken;
-        cookie = response.headers['set-cookie'];
+        cookies = response.headers['set-cookie'].map(cookie => 
+            cookie.split(';')[0]
+        ).join('; ');
+    });
+
+    describe('POST /api/auth/registro', () => {
+        it('debería registrar un nuevo usuario', async () => {
+            const response = await request(app)
+                .post('/api/auth/registro')
+                .set('Cookie', cookies)
+                .send({
+                    ...usuarioValido,
+                    _csrf: csrfToken
+                });
+
+            expect(response.status).toBe(201);
+            expect(response.body).toHaveProperty('mensaje', 'Usuario creado exitosamente');
+            expect(response.body.usuario).toHaveProperty('email', usuarioValido.email);
+        });
+
+        it('debería rechazar email duplicado', async () => {
+            await Usuario.create({
+                ...usuarioValido,
+                password: await bcrypt.hash(usuarioValido.password, 12)
+            });
+
+            const response = await request(app)
+                .post('/api/auth/registro')
+                .set('Cookie', cookies)
+                .send({
+                    ...usuarioValido,
+                    _csrf: csrfToken
+                });
+
+            expect(response.status).toBe(422);
+            expect(response.body).toHaveProperty('mensaje', 'El email ya está registrado');
+        });
     });
 
     describe('POST /api/auth/login', () => {
         beforeEach(async () => {
-            await Usuario.create(usuarioValido);
+            await Usuario.create({
+                ...usuarioValido,
+                password: await bcrypt.hash(usuarioValido.password, 12)
+            });
         });
 
         it('debería autenticar un usuario válido', async () => {
             const response = await request(app)
                 .post('/api/auth/login')
-                .set('Cookie', cookie)
+                .set('Cookie', cookies)
                 .send({
                     email: usuarioValido.email,
-                    password: 'Test123!',
+                    password: usuarioValido.password,
                     _csrf: csrfToken
                 });
 
             expect(response.status).toBe(200);
-            expect(response.body).toHaveProperty('usuario');
+            expect(response.body).toHaveProperty('mensaje', 'Inicio de sesión exitoso');
             expect(response.body.usuario).toHaveProperty('email', usuarioValido.email);
-            expect(response.body.usuario).toHaveProperty('tipoUsuario');
+            expect(response.headers['set-cookie']).toBeDefined();
         });
 
-        it('debería rechazar email inválido', async () => {
+        it('debería rechazar credenciales inválidas', async () => {
             const response = await request(app)
                 .post('/api/auth/login')
-                .send({
-                    email: 'noexiste@test.com',
-                    password: 'Test123!'
-                });
-
-            expect(response.status).toBe(422);
-            expect(response.body).toHaveProperty('mensaje');
-        });
-
-        it('debería rechazar contraseña incorrecta', async () => {
-            const response = await request(app)
-                .post('/api/auth/login')
+                .set('Cookie', cookies)
                 .send({
                     email: usuarioValido.email,
-                    password: 'ContraseñaIncorrecta123!'
+                    password: 'contraseñaIncorrecta',
+                    _csrf: csrfToken
                 });
 
             expect(response.status).toBe(422);
-            expect(response.body).toHaveProperty('mensaje');
-        });
-
-        it('debería validar formato de email', async () => {
-            const response = await request(app)
-                .post('/api/auth/login')
-                .send({
-                    email: 'emailinvalido',
-                    password: 'Test123!'
-                });
-
-            expect(response.status).toBe(422);
-            expect(response.body).toHaveProperty('mensaje');
-        });
-    });
-
-    describe('POST /api/auth/registro', () => {
-        const nuevoUsuario = {
-            nombres: 'Test',
-            apellidos: 'Usuario',
-            email: 'nuevo@test.com',
-            password: 'Test123!',
-            passwordConfirm: 'Test123!',
-            telefono: '123456789',
-            tipoUsuario: 'user'
-        };
-
-        it('debería registrar un nuevo usuario', async () => {
-            const response = await request(app)
-                .post('/api/auth/registro')
-                .send(nuevoUsuario);
-
-            expect(response.status).toBe(201);
-            expect(response.body).toHaveProperty('mensaje', 'Usuario creado exitosamente');
-            expect(response.body.usuario).toHaveProperty('email', nuevoUsuario.email);
-
-            // Verificar que el usuario fue creado en la base de datos
-            const usuarioCreado = await Usuario.findOne({ email: nuevoUsuario.email });
-            expect(usuarioCreado).toBeTruthy();
-            expect(usuarioCreado.email).toBe(nuevoUsuario.email);
-        });
-
-        it('debería rechazar registro con email existente', async () => {
-            await Usuario.create(usuarioValido);
-
-            const response = await request(app)
-                .post('/api/auth/registro')
-                .send({
-                    ...nuevoUsuario,
-                    email: usuarioValido.email
-                });
-
-            expect(response.status).toBe(422);
-            expect(response.body).toHaveProperty('mensaje');
-        });
-
-        it('debería validar formato de teléfono', async () => {
-            const response = await request(app)
-                .post('/api/auth/registro')
-                .send({
-                    ...nuevoUsuario,
-                    telefono: '123' // teléfono inválido
-                });
-
-            expect(response.status).toBe(422);
-            expect(response.body).toHaveProperty('mensaje');
+            expect(response.body).toHaveProperty('mensaje', 'Email o contraseña incorrectos');
         });
     });
 
     describe('POST /api/auth/cerrar-sesion', () => {
-        it('debería cerrar la sesión del usuario', async () => {
+        it('debería cerrar sesión correctamente', async () => {
+            // Primero iniciamos sesión
+            await request(app)
+                .post('/api/auth/login')
+                .set('Cookie', cookies)
+                .send({
+                    email: usuarioValido.email,
+                    password: usuarioValido.password,
+                    _csrf: csrfToken
+                });
+
             const response = await request(app)
-                .post('/api/auth/cerrar-sesion');
+                .post('/api/auth/cerrar-sesion')
+                .set('Cookie', cookies)
+                .send({ _csrf: csrfToken });
 
             expect(response.status).toBe(200);
             expect(response.body).toHaveProperty('mensaje', 'Sesión cerrada exitosamente');

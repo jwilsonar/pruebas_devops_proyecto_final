@@ -9,7 +9,8 @@ const Usuario = require('./models/usuario');
 const flash = require('connect-flash')
 const multer = require('multer');
 const MongoDBStore = require('connect-mongodb-session')(session)
-const csrf = require('csurf');
+const { csrfProtection, handleCsrfError, setCsrfToken } = require('./middleware/csrf_protection');
+const cookieParser = require('cookie-parser');
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -69,22 +70,26 @@ app.use('/imagenes', express.static(path.join(__dirname, 'imagenes')));
 // Configuración de sesión
 const store = new MongoDBStore({
     uri: process.env.MONGODB_URI,
-    collection: 'sessions'
+    collection: 'sessions',
+    expires: 1000 * 60 * 60 * 24 // 1 día
 });
 
+app.use(cookieParser());
 app.use(session({
-    secret: 'valor secreto',
+    secret: process.env.SESSION_SECRET || 'mi_secreto_super_seguro',
     resave: false,
     saveUninitialized: false,
     store: store,
     cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
         maxAge: 1000 * 60 * 60 * 24 // 1 día
     }
 }));
 
-// Configuración de CSRF
-const csrfProtection = csrf();
+// Configuración de CSRF después de la sesión
 app.use(csrfProtection);
+app.use(setCsrfToken);
 
 // Middleware para pasar el token CSRF a las vistas
 app.use((req, res, next) => {
@@ -129,13 +134,8 @@ app.use((error, req, res, next) => {
     });
 });
 
-// Manejo de errores de CSRF
-app.use((err, req, res, next) => {
-    if (err.code === 'EBADCSRFTOKEN') {
-        return res.status(403).json({ mensaje: 'Token CSRF inválido' });
-    }
-    next(err);
-});
+// Manejo de errores CSRF
+app.use(handleCsrfError);
 
 mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
