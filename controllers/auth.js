@@ -1,206 +1,142 @@
 const Usuario = require('../models/usuario');
-const bcrypt = require('bcryptjs')
-
+const bcrypt = require('bcryptjs');
 const { validationResult } = require('express-validator');
 
-exports.getLogin=(req, res, next)=>{
-    let mensaje = req.flash('error');
-    console.log(mensaje)
-    if(mensaje.length>0) mensaje=mensaje[0];
-    else mensaje = null;
+exports.login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const usuario = await Usuario.findOne({ email });
 
-    if(req.session.autenticado){
-        if(req.session.tipoUsuario==='admin') res.redirect('/admin/')
-        else if (req.session.tipoUsuario==='user') res.redirect('/')
-    }
-    console.log(req.erroresValidacion)
-    res.render('auth/login', {
-        path: '/login',
-        titulo: 'Inicio de sesión',
-        autenticado: req.session.autenticado,
-        tipoUsuario: req.session.tipoUsuario,
-        mensaje: mensaje,
-        datosAnteriores: {
-            email: '',
-            password: ''
-        },
-        erroresValidacion: []
-    });
-}
-exports.postLogin=(req, res, next)=>{
-    const email = req.body.email;
-    const password = req.body.password;
-    const errors = validationResult(req);
-    console.log(errors)
-    if (!errors.isEmpty()) {
-        return res.status(422).render('auth/login', {
-            path: '/login',
-            titulo: 'Iniciar sesion',
-            mensaje: errors.array()[0].msg,
-            autenticado: req.session.autenticado,
-            tipoUsuario: req.session.tipoUsuario,
-            datosAnteriores: {
-                email: email,
-                password: password
-            },
-            erroresValidacion: errors.array()
+        if (!usuario) {
+            return res.status(422).json({
+                mensaje: 'Email o contraseña incorrectos'
+            });
+        }
+
+        const coincide = await bcrypt.compare(password, usuario.password);
+        if (!coincide) {
+            return res.status(422).json({
+                mensaje: 'Email o contraseña incorrectos'
+            });
+        }
+
+        req.session.autenticado = true;
+        req.session.usuario = {
+            _id: usuario._id,
+            email: usuario.email,
+            tipoUsuario: usuario.tipoUsuario
+        };
+
+        await new Promise((resolve, reject) => {
+            req.session.save(err => {
+                if (err) reject(err);
+                resolve();
+            });
+        });
+
+        res.status(200).json({
+            usuario: {
+                id: usuario._id,
+                email: usuario.email,
+                tipoUsuario: usuario.tipoUsuario
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            mensaje: 'Error al iniciar sesión',
+            error: error.message
         });
     }
+};
 
-    Usuario.findOne({ email: email })
-    .then(usuario => {
-        if (!usuario) {
-            return res.status(422).render('auth/login', {
-                path: '/login',
-                titulo: 'Iniciar sesión',
-                mensaje: 'Correo o contraseña incorrectos',
-                autenticado: req.session.autenticado,
-                tipoUsuario: req.session.tipoUsuario,
-                datosAnteriores: {
-                    email: email,
-                    password: password
-                },
-                erroresValidacion: []
+exports.registro = async (req, res) => {
+    try {
+        console.log('Registro request body:', req.body);
+        const { nombres, apellidos, email, password, telefono } = req.body;
+
+        // Validar campos requeridos
+        if (!nombres || !apellidos || !email || !password || !telefono) {
+            return res.status(422).json({
+                mensaje: 'Todos los campos son requeridos'
             });
         }
-        bcrypt
-            .compare(password, usuario.password)
-            .then(hayCoincidencia => {
-                if (hayCoincidencia) {
-                    req.session.autenticado = true;
-                    req.session.tipoUsuario = usuario.tipoUsuario;
-                    req.session.usuario=usuario;
-                    return req.session.save(err => {
-                        console.log(err);
-                        if(req.session.tipoUsuario==='admin') res.redirect('/admin/');
-                        else res.redirect('/');
-                    });
-                }
-                return res.status(422).render('auth/login', {
-                    path: '/login',
-                    titulo: 'Iniciar sesión',
-                    mensaje: 'Contraseña incorrecta',
-                    autenticado: req.session.autenticado,
-                    tipoUsuario: req.session.tipoUsuario,
-                    datosAnteriores: {
-                        email: email,
-                        password: ''
-                    },
-                    erroresValidacion: []
-                });
-            })
-            .catch(err => {
-                console.log(err);
-                res.redirect('/ingresar');
+
+        // Validar email
+        const emailRegex = /^\S+@\S+\.\S+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(422).json({
+                mensaje: 'Email inválido'
             });
-        })
-    .catch(err => {
-        const error = new Error(err);
-        error.httpStatusCode = 500;
-        return next(error);
-    });
-};
-exports.getRegistro=(req, res, next)=>{
-    res.render('auth/registro', {
-        path:'/registro',
-        titulo: 'Registro',
-        autenticado: req.session.autenticado,
-        tipoUsuario: req.session.tipoUsuario,
-        mensaje: '',
-        datosAnteriores:{
-            nombres:'',
-            apellidos: '',
-            email: '',
-            password:'',
-            passwordConfirm:''
-        },
-        erroresValidacion: []
-    });
-}
-exports.postRegistro=(req, res, next)=>{
-    const nombres = req.body.nombres;
-    const apellidos = req.body.apellidos;
-    const telefono = req.body.telefono;
-    const email = req.body.email;
-    const password = req.body.password;
-    const passwordConfirm = req.body.passwordConfirm;
-    const tipoUsuario='user';
-    const errors = validationResult(req);
-    if(!errors.isEmpty()){
-        return res.status(422).render('auth/registro',{
-            path:'/registro',
-            titulo: 'Registro',
-            autenticado: req.session.autenticado,
-            tipoUsuario: req.session.tipoUsuario,
-            mensaje: errors.array()[0].msg,
-            datosAnteriores:{
-                nombres:'',
-                apellidos: '',
-                email: '',
-                password:'',
-                passwordConfirm:''
-            },
-            erroresValidacion: errors.array()
-        })
-    }
-    bcrypt.hash(password, 12).then(passwordHashed=>{
-        const newUser = new Usuario({
+        }
+
+        // Validar teléfono
+        const telefonoRegex = /^\d{9}$/;
+        const tel = telefono.toString().trim();
+        if (!telefonoRegex.test(tel)) {
+            return res.status(422).json({
+                mensaje: 'El teléfono debe tener 9 dígitos numéricos'
+            });
+        }
+
+        // Verificar si el usuario ya existe
+        const usuarioExistente = await Usuario.findOne({ email });
+        if (usuarioExistente) {
+            return res.status(422).json({
+                mensaje: 'El email ya está registrado'
+            });
+        }
+
+        // Validar contraseña
+        if (password.length < 4) {
+            return res.status(422).json({
+                mensaje: 'La contraseña debe tener al menos 4 caracteres'
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 12);
+        const usuario = new Usuario({
             nombres,
             apellidos,
-            tipoUsuario,
-            telefono,
-            email, 
-            password: passwordHashed,
-            carrito: {items:[]},
-            listaDeseos: {items:[]}
-        })
-        return newUser.save()
-    }).then(err=>{
-        console.log(err);
-        res.redirect('/login')
-    })
-}
+            email,
+            password: hashedPassword,
+            telefono: tel,
+            tipoUsuario: 'user',
+            carrito: { items: [] }
+        });
 
-exports.cerrarSesion=(req, res, next)=>{
-    req.session.destroy(err=>{
-        console.log(err);
-        res.redirect('/');
-    })
-}
-exports.getCrearAdmin=(req,res,next)=>{
-    res.render('auth/crear-admin',{
-        path: '/crear-admin',
-        titulo: 'Registro Administrador',
-        autenticado: req.session.autenticado,
-        tipoUsuario: req.session.tipoUsuario
-    })
-}
-exports.postCrearAdmin=(req, res, next)=>{
-    const nombres = req.body.nombres;
-    const apellidos = req.body.apellidos;
-    const telefono = req.body.telefono;
-    const email = req.body.email;
-    const password = req.body.password;
-    const passwordConfirm = req.body.passwordConfirm;
-    const tipoUsuario='user';
+        const usuarioGuardado = await usuario.save();
 
-    Usuario.findOne({email:email}).then(
-        user=>{
-            if(user) return res.redirect('/registrarse');
-            return bcrpyt.hash(password, 12).then(passwordHashed=>{
-                const newUser = new Usuario({
-                    nombres,
-                    apellidos,
-                    tipoUsuario,
-                    telefono,
-                    email, 
-                    password: passwordHashed,
-                    carrito: {items:[]},
-                    listaDeseos: {items:[]}
-                })
-                return newUser.save()
-            })
+        res.status(201).json({
+            mensaje: 'Usuario creado exitosamente',
+            usuario: {
+                id: usuarioGuardado._id,
+                email: usuarioGuardado.email
+            }
+        });
+    } catch (error) {
+        console.error('Error en registro:', error);
+        if (error.code === 11000) {
+            return res.status(422).json({
+                mensaje: 'El email ya está registrado'
+            });
         }
-    )
-    res.redirect('/login')
-}
+        res.status(500).json({
+            mensaje: 'Error al crear usuario',
+            error: error.message
+        });
+    }
+};
+
+exports.cerrarSesion = (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            return res.status(500).json({
+                mensaje: 'Error al cerrar sesión',
+                error: err.message
+            });
+        }
+        res.status(200).json({
+            mensaje: 'Sesión cerrada exitosamente'
+        });
+    });
+};

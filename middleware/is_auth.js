@@ -1,8 +1,8 @@
-module.exports = (req, res, next)=>{
-    if(!req.session.autenticado){
-        return res.redirect('/login');
-    }else{
-        if(req.session.tipoUsuario !== 'admin') return res.redirect('/login')
+module.exports = (req, res, next) => {
+    if (!req.session || !req.session.autenticado || !req.session.usuario) {
+        return res.status(401).json({
+            mensaje: 'No autorizado'
+        });
     }
     next();
-}
+};

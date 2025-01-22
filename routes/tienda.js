@@ -1,33 +1,14 @@
-const path = require('path');
 const express = require('express');
-const tiendaController = require('../controllers/tienda.js');
 const router = express.Router();
+const tiendaController = require('../controllers/tienda');
+const isAuth = require('../middleware/is_auth');
 
-// GET requiere una coincidencia exacta en la ruta
-router.get('/', tiendaController.getIndex);
 router.get('/productos', tiendaController.getProductos);
-router.get('/productos/:slug', tiendaController.getProducto);
-
-router.get('/carrito', tiendaController.getCarrito);
-
-router.post('/carrito', tiendaController.postCarrito);
-
-router.post('/eliminar-producto-carrito', tiendaController.postEliminarProductoCarrito);
-
-//ver categorias
+router.get('/producto/:slug', tiendaController.getProducto);
+router.get('/carrito', isAuth, tiendaController.getCarrito);
+router.post('/carrito', isAuth, tiendaController.postCarrito);
+router.post('/carrito-eliminar-item', isAuth, tiendaController.postEliminarProductoCarrito);
 router.get('/categorias', tiendaController.getCategorias);
-router.get('/categorias/:slug', tiendaController.getCategoria);
-
-// //ver desarrolladores
-router.get('/desarrolladores', tiendaController.getDesarrolladores)
-router.get('/desarrolladores/:slug', tiendaController.getDesarrollador)
-
-// //ver genero
-router.get('/generos', tiendaController.getGeneros)
-router.get('/generos/:slug', tiendaController.getGenero);
-
-// //ver Plataforma
-//router.get('/plataformas', tiendaController.getPlataformas)
-//router.get('/plataformas/:slug', tiendaController.getPlataforma);
+router.get('/categoria/:slug', tiendaController.getCategoria);
 
 module.exports = router;
