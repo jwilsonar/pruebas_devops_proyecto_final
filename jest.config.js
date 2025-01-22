@@ -13,11 +13,8 @@ module.exports = {
   transform: {
     '^.+\\.js$': 'babel-jest'
   },
-  // Agregar esto para manejar módulos ES
   moduleFileExtensions: ['js', 'json', 'node'],
-  // Ignorar node_modules
   transformIgnorePatterns: ['/node_modules/'],
-  // Variables globales para tests
   globals: {
     __MONGOD__: null
   }

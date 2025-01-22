@@ -1,0 +1,171 @@
+{
+  "aggregate": {
+    "counters": {
+      "vusers.created_by_name.0": 600,
+      "vusers.created": 600,
+      "http.requests": 600,
+      "plugins.metrics-by-endpoint./api/tienda/productos.errors.ECONNREFUSED": 600,
+      "errors.ECONNREFUSED": 600,
+      "vusers.failed": 600
+    },
+    "rates": {
+      "http.request_rate": 10
+    },
+    "firstCounterAt": 1737518737629,
+    "lastCounterAt": 1737518797147,
+    "firstMetricAt": 1737518737629,
+    "lastMetricAt": 1737518797147,
+    "period": 1737518790000,
+    "summaries": {},
+    "histograms": {}
+  },
+  "intermediate": [
+    {
+      "counters": {
+        "vusers.created_by_name.0": 27,
+        "vusers.created": 27,
+        "http.requests": 27,
+        "plugins.metrics-by-endpoint./api/tienda/productos.errors.ECONNREFUSED": 27,
+        "errors.ECONNREFUSED": 27,
+        "vusers.failed": 27
+      },
+      "rates": {
+        "http.request_rate": 20
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1737518737629,
+      "lastCounterAt": 1737518739983,
+      "firstMetricAt": 1737518737629,
+      "lastMetricAt": 1737518739983,
+      "period": "1737518730000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.0": 100,
+        "vusers.created": 100,
+        "http.requests": 100,
+        "plugins.metrics-by-endpoint./api/tienda/productos.errors.ECONNREFUSED": 100,
+        "errors.ECONNREFUSED": 100,
+        "vusers.failed": 100
+      },
+      "rates": {
+        "http.request_rate": 10
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1737518740030,
+      "lastCounterAt": 1737518749982,
+      "firstMetricAt": 1737518740030,
+      "lastMetricAt": 1737518749982,
+      "period": "1737518740000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.0": 100,
+        "vusers.created": 100,
+        "http.requests": 100,
+        "plugins.metrics-by-endpoint./api/tienda/productos.errors.ECONNREFUSED": 100,
+        "errors.ECONNREFUSED": 100,
+        "vusers.failed": 100
+      },
+      "rates": {
+        "http.request_rate": 10
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1737518750030,
+      "lastCounterAt": 1737518759982,
+      "firstMetricAt": 1737518750030,
+      "lastMetricAt": 1737518759982,
+      "period": "1737518750000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.0": 100,
+        "vusers.created": 100,
+        "http.requests": 100,
+        "plugins.metrics-by-endpoint./api/tienda/productos.errors.ECONNREFUSED": 100,
+        "errors.ECONNREFUSED": 100,
+        "vusers.failed": 100
+      },
+      "rates": {
+        "http.request_rate": 10
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1737518760030,
+      "lastCounterAt": 1737518769983,
+      "firstMetricAt": 1737518760030,
+      "lastMetricAt": 1737518769983,
+      "period": "1737518760000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.0": 100,
+        "vusers.created": 100,
+        "http.requests": 100,
+        "plugins.metrics-by-endpoint./api/tienda/productos.errors.ECONNREFUSED": 100,
+        "errors.ECONNREFUSED": 100,
+        "vusers.failed": 100
+      },
+      "rates": {
+        "http.request_rate": 10
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1737518770030,
+      "lastCounterAt": 1737518779982,
+      "firstMetricAt": 1737518770030,
+      "lastMetricAt": 1737518779982,
+      "period": "1737518770000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.0": 100,
+        "vusers.created": 100,
+        "http.requests": 100,
+        "plugins.metrics-by-endpoint./api/tienda/productos.errors.ECONNREFUSED": 100,
+        "errors.ECONNREFUSED": 100,
+        "vusers.failed": 100
+      },
+      "rates": {
+        "http.request_rate": 10
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1737518780030,
+      "lastCounterAt": 1737518789970,
+      "firstMetricAt": 1737518780030,
+      "lastMetricAt": 1737518789970,
+      "period": "1737518780000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.0": 73,
+        "vusers.created": 73,
+        "http.requests": 73,
+        "plugins.metrics-by-endpoint./api/tienda/productos.errors.ECONNREFUSED": 73,
+        "errors.ECONNREFUSED": 73,
+        "vusers.failed": 73
+      },
+      "rates": {
+        "http.request_rate": 10
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1737518790017,
+      "lastCounterAt": 1737518797147,
+      "firstMetricAt": 1737518790017,
+      "lastMetricAt": 1737518797147,
+      "period": "1737518790000",
+      "summaries": {},
+      "histograms": {}
+    }
+  ]
+}

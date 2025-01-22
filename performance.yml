@@ -1,0 +1,18 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    - duration: 60
+      arrivalRate: 10
+scenarios:
+  - flow:
+      - get:
+          url: "/api/tienda/productos"
+      - post:
+          url: "/api/auth/login"
+          json:
+            email: "test@test.com"
+            password: "Test123!"
+      - get:
+          url: "/api/tienda/carrito"
+          headers:
+            Cookie: "session_id={{ $randomString(10) }}" 
