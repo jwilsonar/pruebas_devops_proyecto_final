@@ -9,6 +9,7 @@ const Usuario = require('./models/usuario');
 const flash = require('connect-flash')
 const multer = require('multer');
 const MongoDBStore = require('connect-mongodb-session')(session)
+const csrf = require('csurf');
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -67,16 +68,29 @@ app.use('/imagenes', express.static(path.join(__dirname, 'imagenes')));
 
 // Configuración de sesión
 const store = new MongoDBStore({
-    uri: MONGODB_URI,
+    uri: process.env.MONGODB_URI,
     collection: 'sessions'
-})
+});
 
 app.use(session({
     secret: 'valor secreto',
     resave: false,
     saveUninitialized: false,
-    store: store
+    store: store,
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 24 // 1 día
+    }
 }));
+
+// Configuración de CSRF
+const csrfProtection = csrf();
+app.use(csrfProtection);
+
+// Middleware para pasar el token CSRF a las vistas
+app.use((req, res, next) => {
+    res.locals.csrfToken = req.csrfToken();
+    next();
+});
 
 app.use(flash());
 
@@ -109,11 +123,18 @@ app.use((req, res) => {
 });
 
 app.use((error, req, res, next) => {
-    console.error(error);
     res.status(error.httpStatusCode || 500).json({
         mensaje: error.message || 'Error interno del servidor',
         error: process.env.NODE_ENV === 'development' ? error : {}
     });
+});
+
+// Manejo de errores de CSRF
+app.use((err, req, res, next) => {
+    if (err.code === 'EBADCSRFTOKEN') {
+        return res.status(403).json({ mensaje: 'Token CSRF inválido' });
+    }
+    next(err);
 });
 
 mongoose.connect(process.env.MONGODB_URI, {

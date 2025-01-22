@@ -3,8 +3,12 @@ const app = require('../../app');
 const Usuario = require('../../models/usuario');
 const { usuarioValido } = require('../fixtures/usuarios');
 
+// DESARROLLADO POR: JOEL ALBORNOZ Y JORGE AMAYA.
+
 describe('Auth Controller', () => {
     let server;
+    let csrfToken;
+    let cookie;
 
     beforeAll(() => {
         server = app.listen(3001);
@@ -16,6 +20,12 @@ describe('Auth Controller', () => {
 
     beforeEach(async () => {
         await Usuario.deleteMany({});
+
+        // Obtener el token CSRF
+        const response = await request(app)
+            .get('/api/auth/csrf-token');
+        csrfToken = response.body.csrfToken;
+        cookie = response.headers['set-cookie'];
     });
 
     describe('POST /api/auth/login', () => {
@@ -26,9 +36,11 @@ describe('Auth Controller', () => {
         it('debería autenticar un usuario válido', async () => {
             const response = await request(app)
                 .post('/api/auth/login')
+                .set('Cookie', cookie)
                 .send({
                     email: usuarioValido.email,
-                    password: 'Test123!'
+                    password: 'Test123!',
+                    _csrf: csrfToken
                 });
 
             expect(response.status).toBe(200);

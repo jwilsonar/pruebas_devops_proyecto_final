@@ -7,8 +7,11 @@ const path = require('path');
 const Usuario = require('../../models/usuario');
 const bcrypt = require('bcrypt');
 
+// DESARROLLADO POR: YOURI GAMBOA Y ANGELES TASAYCO
+
 describe('Productos Controller', () => {
     let server;
+    let csrfToken;
     let cookie;
 
     beforeAll(() => {
@@ -23,6 +26,12 @@ describe('Productos Controller', () => {
         await Producto.deleteMany({});
         await Usuario.deleteMany({});
 
+        // Obtener el token CSRF
+        const response = await request(app)
+            .get('/api/auth/csrf-token');
+        csrfToken = response.body.csrfToken;
+        cookie = response.headers['set-cookie'];
+
         // Crear usuario administrador y autenticar
         const admin = await Usuario.create({
             nombres: 'Admin',
@@ -35,9 +44,11 @@ describe('Productos Controller', () => {
 
         const loginResponse = await request(app)
             .post('/api/auth/login')
+            .set('Cookie', cookie)
             .send({
                 email: admin.email,
-                password: 'Admin123!'
+                password: 'Admin123!',
+                _csrf: csrfToken
             });
 
         cookie = loginResponse.headers['set-cookie'];

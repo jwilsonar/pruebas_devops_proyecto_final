@@ -7,6 +7,7 @@ const { productoValido } = require('../fixtures/productos');
 const { usuarioValido } = require('../fixtures/usuarios');
 const { categoriaValida } = require('../fixtures/categorias');
 
+// DESARROLLADO POR: JOEL ALBORNOZ Y JORGE AMAYA.
 describe('Tienda Controller', () => {
     let server;
     let cookie;

@@ -1,6 +1,8 @@
 const Usuario = require('../models/usuario');
 const bcrypt = require('bcryptjs');
+const csrf = require('csurf');
 const { validationResult } = require('express-validator');
+const session = require('express-session');
 
 exports.login = async (req, res) => {
     try {
@@ -12,7 +14,6 @@ exports.login = async (req, res) => {
                 mensaje: 'Email o contraseña incorrectos'
             });
         }
-
         const coincide = await bcrypt.compare(password, usuario.password);
         if (!coincide) {
             return res.status(422).json({
@@ -39,7 +40,8 @@ exports.login = async (req, res) => {
                 id: usuario._id,
                 email: usuario.email,
                 tipoUsuario: usuario.tipoUsuario
-            }
+            },
+            csrfToken: req.csrfToken()
         });
     } catch (error) {
         res.status(500).json({
@@ -51,16 +53,13 @@ exports.login = async (req, res) => {
 
 exports.registro = async (req, res) => {
     try {
-        console.log('Registro request body:', req.body);
         const { nombres, apellidos, email, password, telefono } = req.body;
-
         // Validar campos requeridos
         if (!nombres || !apellidos || !email || !password || !telefono) {
             return res.status(422).json({
                 mensaje: 'Todos los campos son requeridos'
             });
         }
-
         // Validar email
         const emailRegex = /^\S+@\S+\.\S+$/;
         if (!emailRegex.test(email)) {
@@ -68,7 +67,6 @@ exports.registro = async (req, res) => {
                 mensaje: 'Email inválido'
             });
         }
-
         // Validar teléfono
         const telefonoRegex = /^\d{9}$/;
         const tel = telefono.toString().trim();
@@ -139,4 +137,8 @@ exports.cerrarSesion = (req, res) => {
             mensaje: 'Sesión cerrada exitosamente'
         });
     });
+};
+
+exports.getCsrfToken = (req, res) => {
+    res.status(200).json({ csrfToken: req.csrfToken() });
 };
