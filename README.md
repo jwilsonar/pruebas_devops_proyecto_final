@@ -12,7 +12,34 @@ El proyecto utiliza las siguientes dependencias:
 - `mongoose`: ODM para interactuar con MongoDB.
 - `connect-flash`: Middleware para mostrar mensajes de flash.
 - `multer`: Middleware para manejar la carga de archivos (imágenes).
-- `connect-mongodb-session`: Almacenamiento de sesiones en MongoDB.
+
+## Pruebas
+
+Para ejecutar las pruebas de integración, utiliza el siguiente comando:
+
+```bash
+npm test
+```
+```bash
+npm run test:integration
+```
+```bash
+npm run test:performance
+```
+```bash
+npm run test:load
+```
+
+## Dependencias de pruebas
+
+- `supertest`: Middleware para realizar pruebas de integración.
+- `jest`: Framework para pruebas unitarias.
+- `express-session`: Middleware para manejar sesiones en pruebas de integración.
+- `dotenv`: Middleware para manejar variables de entorno.
+- `bcryptjs`: Middleware para encriptar contraseñas.
+- `mongoose`: ODM para interactuar con MongoDB.
+- `artillery`: Middleware para realizar pruebas de carga.
+- `csrf`: Middleware para manejar tokens CSRF.
 
 ## Configuración
 
