@@ -4,7 +4,7 @@ const csrfProtection = csrf({
     cookie: {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict'
+        sameSite: 'lax'
     }
 });
 
@@ -24,7 +24,7 @@ const setCsrfToken = (req, res, next) => {
         res.cookie('XSRF-TOKEN', token, {
             httpOnly: false,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict'
+            sameSite: 'lax'
         });
         next();
     } catch (error) {

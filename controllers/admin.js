@@ -90,14 +90,9 @@ exports.getDetalleProducto = (req, res) => {
 };
 
 exports.postCrearProducto = async (req, res) => {
+    console.log(req.session);
     try {
-        // Verificar autenticación y rol de admin
-        if (!req.session?.autenticado || req.session?.usuario?.tipoUsuario !== 'admin') {
-            return res.status(401).json({
-                mensaje: 'No autorizado'
-            });
-        }
-
+        
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(422).json({

@@ -9,7 +9,7 @@ exports.login = async (req, res) => {
         if (!errors.isEmpty()) {
             return res.status(422).json({ 
                 mensaje: 'Error de validación',
-                errores: errors.array() 
+                errores: errors.array()
             });
         }
 
@@ -22,25 +22,21 @@ exports.login = async (req, res) => {
             });
         }
 
-        const coincide = await bcrypt.compare(password, usuario.password);
-        if (!coincide) {
+        const passwordValido = await bcrypt.compare(password, usuario.password);
+        if (!passwordValido) {
             return res.status(422).json({
                 mensaje: 'Email o contraseña incorrectos'
             });
         }
 
+        req.session.autenticado = true;
         req.session.usuario = {
             _id: usuario._id,
             email: usuario.email,
             tipoUsuario: usuario.tipoUsuario
         };
-
-        await new Promise((resolve, reject) => {
-            req.session.save(err => {
-                if (err) reject(err);
-                resolve();
-            });
-        });
+        console.log(req.session);
+        await req.session.save();
 
         res.status(200).json({
             mensaje: 'Inicio de sesión exitoso',
@@ -85,7 +81,7 @@ exports.registro = async (req, res) => {
             nombres,
             apellidos,
             telefono,
-            tipoUsuario: tipoUsuario || 'cliente',
+            tipoUsuario: tipoUsuario || 'user',
             carrito: { items: [] }
         });
 

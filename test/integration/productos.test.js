@@ -1,57 +1,57 @@
 const request = require('supertest');
 const app = require('../../app');
 const Producto = require('../../models/producto');
-const { productoValido } = require('../fixtures/productos');
-const { crearSesionAdmin } = require('../helpers/auth');
-const path = require('path');
 const Usuario = require('../../models/usuario');
-const bcrypt = require('bcrypt');
+const { productoValido } = require('../fixtures/productos');
+const { adminValido } = require('../fixtures/usuarios');
+const bcrypt = require('bcryptjs');
+const { connect, disconnect, clearDatabase } = require('../helpers/db');
 
 // DESARROLLADO POR: YOURI GAMBOA Y ANGELES TASAYCO
 
 describe('Productos Controller', () => {
     let server;
     let csrfToken;
-    let cookie;
+    let cookies;
+    let admin;
+    let agent;
 
-    beforeAll(() => {
+    beforeAll(async () => {
         server = app.listen(3002);
-    });
 
-    afterAll(done => {
-        server.close(done);
-    });
-
-    beforeEach(async () => {
-        await Producto.deleteMany({});
-        await Usuario.deleteMany({});
-
-        // Obtener el token CSRF
-        const response = await request(app)
-            .get('/api/auth/csrf-token');
-        csrfToken = response.body.csrfToken;
-        cookie = response.headers['set-cookie'];
-
-        // Crear usuario administrador y autenticar
-        const admin = await Usuario.create({
-            nombres: 'Admin',
-            apellidos: 'Test',
-            email: 'admin@test.com',
-            password: await bcrypt.hash('Admin123!', 12),
-            telefono: '123456789',
-            tipoUsuario: 'admin'
+        // Crear admin
+        const hashedPassword = await bcrypt.hash('Admin123!', 12);
+        admin = await Usuario.create({
+            ...adminValido,
+            password: hashedPassword
         });
 
+        // Obtener CSRF token inicial
+        const csrfResponse = await request(app)
+            .get('/api/auth/csrf-token');
+
+        cookies = csrfResponse.headers['set-cookie'];
+        const xsrfHeader = cookies.find(cookie => cookie.startsWith('XSRF-TOKEN='));
+        csrfToken = xsrfHeader ? xsrfHeader.split('=')[1].split(';')[0] : null;
+
+        // Login como admin
         const loginResponse = await request(app)
             .post('/api/auth/login')
-            .set('Cookie', cookie)
+            .set('Cookie', cookies)
+            .set('X-CSRF-Token', csrfToken)
             .send({
-                email: admin.email,
+                email: adminValido.email,
                 password: 'Admin123!',
                 _csrf: csrfToken
             });
 
-        cookie = loginResponse.headers['set-cookie'];
+        console.log('Admin login response:', loginResponse.body);
+        console.log('Session cookies:', cookies);
+        console.log('CSRF Token:', csrfToken);
+    });
+
+    afterAll(async () => {
+        await server.close();
     });
 
     describe('GET /api/tienda/productos', () => {
@@ -62,7 +62,7 @@ describe('Productos Controller', () => {
         it('debería obtener lista de productos', async () => {
             const response = await request(app)
                 .get('/api/tienda/productos');
-
+            console.log('Productos response:', response.body);
             expect(response.status).toBe(200);
             expect(response.body.productos).toBeInstanceOf(Array);
             expect(response.body.productos).toHaveLength(1);
@@ -71,10 +71,12 @@ describe('Productos Controller', () => {
         it('debería filtrar productos por categoría', async () => {
             const response = await request(app)
                 .get('/api/tienda/productos')
-                .query({ categoria: productoValido.categoria });
+                .query({ categoria: productoValido.idCategoria });
 
+            console.log('Productos response:', response.body);
             expect(response.status).toBe(200);
             expect(response.body.productos).toBeInstanceOf(Array);
         });
     });
+
 }); 

@@ -19,8 +19,10 @@ exports.getProductos = async (req, res) => {
 };
 
 exports.getProducto = async (req, res) => {
+    console.log(req.params);
     try {
         const producto = await Producto.findOne({ slug: req.params.slug });
+        console.log(producto);
         if (!producto) {
             return res.status(404).json({ mensaje: 'Producto no encontrado' });
         }
